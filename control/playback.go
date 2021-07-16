@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func togglePlayback() error {
+func togglePlay() error {
 	if err := updateDevice(); err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func getPlaying() (*spotify.FullTrack, error) {
 	}
 	isPlaying = cp.Playing
 	if cp.Item == nil {
-		return nil, fmt.Errorf("Not playing a track.")
+		return nil, fmt.Errorf("not playing a track")
 	}
 	return cp.Item, nil
 }
@@ -252,5 +252,27 @@ func handleSetDevice(arg string) error {
 	}
 	fmt.Printf("Playing on %s.\n", dev.Name)
 	device = dev
+	return nil
+}
+
+func handleShow(arg string) error {
+	if err := updateDevice(); err != nil {
+		return err
+	}
+	state, err := client.PlayerState()
+	if err != nil {
+		return err
+	}
+	device = &state.Device
+	shuffleState = state.ShuffleState
+	repeatState = state.RepeatState
+	isPlaying = state.Playing
+	t := state.Item
+	if t == nil {
+		fmt.Println("Not playing a track.")
+	} else {
+		fmt.Printf("Currently playing %s [%s] by %s.\n", t.Name, t.Album.Name, joinArtists(t.Artists))
+		fmt.Printf("shuffle = %t\nrepeat = %s\n", shuffleState, repeatState)
+	}
 	return nil
 }

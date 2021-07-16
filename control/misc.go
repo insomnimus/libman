@@ -10,7 +10,7 @@ func handlePrompt(arg string) error {
 		handlers.ShowUsage(cmd.Prompt)
 		return nil
 	}
-	prompt = arg + " "
+	prompt = arg
 	return nil
 }
 

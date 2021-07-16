@@ -230,5 +230,14 @@ func DefaultHandlers() []handler.Handler {
 			nil,
 			handleHelp,
 		),
+		hand(
+			cmd.Show,
+			"show",
+			"Show the currently playing track.",
+			"show",
+			"Show the currently playing track.",
+			[]string{"sw", "ls"},
+			handleShow,
+		),
 	}
 }

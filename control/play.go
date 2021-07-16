@@ -64,7 +64,7 @@ func playPlaylist(p *Playlist) error {
 	err := client.PlayOpt(&spotify.PlayOptions{
 		DeviceID:        &device.ID,
 		PlaybackContext: &p.URI,
-		PlaybackOffset:  &spotify.PlaybackOffset{Position: 0},
+		//PlaybackOffset:  &spotify.PlaybackOffset{Position: 0},
 	})
 	if err != nil {
 		return err

@@ -99,6 +99,9 @@ func choosePlaylist(arg string) *Playlist {
 }
 
 func handleEditPlaylist(arg string) error {
-	fmt.Println("unimplemented")
-	return nil
+	pl := choosePlaylist(arg)
+	if pl == nil {
+		return nil
+	}
+	return pl.editDetails()
 }

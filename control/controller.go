@@ -6,12 +6,14 @@ import (
 )
 
 var (
-	client    *spotify.Client
-	user      *spotify.PrivateUser
-	prompt    string
-	handlers  handler.Set
-	cache     = new(PlaylistCache)
-	lastPl    *Playlist
-	isPlaying bool
-	deviceID  *spotify.ID
+	client       *spotify.Client
+	user         *spotify.PrivateUser
+	device       *spotify.PlayerDevice
+	prompt       string
+	handlers     handler.Set
+	cache        = new(PlaylistCache)
+	lastPl       *Playlist
+	isPlaying    bool
+	shuffleState bool
+	repeatState  string
 )

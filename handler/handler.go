@@ -13,6 +13,7 @@ type Handler struct {
 	Help    string
 	About   string
 	Usage   string
+	Run     func(string) error
 }
 
 type Set []Handler

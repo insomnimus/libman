@@ -2,7 +2,6 @@ package control
 
 import (
 	"fmt"
-	"github.com/zmb3/spotify"
 	"libman/handler/cmd"
 )
 
@@ -12,18 +11,16 @@ func handlePFTrack(arg string) error {
 		return nil
 	}
 
-	q := trackQuery(arg)
-	page, err := client.Search(q, spotify.SearchTypeTrack)
+	tracks, err := searchTrack(arg)
 	if err != nil {
 		return err
 	}
-
-	if page.Tracks == nil || len(page.Tracks.Tracks) == 0 {
-		fmt.Printf("no result for %q\n", q)
+	if len(tracks) == 0 {
+		fmt.Printf("no result for %q\n", arg)
 		return nil
 	}
 
-	track := &page.Tracks.Tracks[0]
+	track := &tracks[0]
 	return playTrack(track)
 }
 
@@ -32,19 +29,16 @@ func handlePlayFAlbum(arg string) error {
 		handlers.ShowUsage(cmd.PlayFirstAlbum)
 		return nil
 	}
-
-	q := albumQuery(arg)
-	page, err := client.Search(q, spotify.SearchTypeAlbum)
+	albs, err := searchAlbum(arg)
 	if err != nil {
 		return err
 	}
-	if page.Albums == nil || len(page.Albums.Albums) == 0 {
-		fmt.Printf("no result for %q\n", q)
+	if len(albs) == 0 {
+		fmt.Printf("no result for %q\n", arg)
 		return nil
 	}
 
-	alb := &page.Albums.Albums[0]
-	return playAlbum(alb)
+	return playAlbum(&albs[0])
 }
 
 func handlePlayFArtist(arg string) error {
@@ -53,19 +47,17 @@ func handlePlayFArtist(arg string) error {
 		return nil
 	}
 
-	page, err := client.Search(arg, spotify.SearchTypeArtist)
+	arts, err := searchArtist(arg)
 	if err != nil {
 		return err
 	}
 
-	if page.Artists == nil || len(page.Artists.Artists) == 0 {
+	if len(arts) == 0 {
 		fmt.Printf("no result for %s\n", arg)
 		return nil
 	}
 
-	art := &page.Artists.Artists[0]
-
-	return playArtist(art)
+	return playArtist(&arts[0])
 }
 
 func handlePlayFPlaylist(arg string) error {
@@ -74,16 +66,16 @@ func handlePlayFPlaylist(arg string) error {
 		return nil
 	}
 
-	page, err := client.Search(arg, spotify.SearchTypePlaylist)
+	pls, err := searchPlaylist(arg)
 	if err != nil {
 		return err
 	}
 
-	if page.Playlists == nil || len(page.Playlists.Playlists) == 0 {
+	if len(pls) == 0 {
 		fmt.Printf("no result for %q", arg)
 		return nil
 	}
 
-	pl := plFromSimple(page.Playlists.Playlists[0])
+	pl := plFromSimple(pls[0])
 	return playPlaylist(&pl)
 }

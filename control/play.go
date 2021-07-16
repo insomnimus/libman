@@ -6,8 +6,11 @@ import (
 )
 
 func playTrack(t *spotify.FullTrack) error {
+	if err := updateDevice(); err != nil {
+		return err
+	}
 	err := client.PlayOpt(&spotify.PlayOptions{
-		DeviceID: deviceID,
+		DeviceID: &device.ID,
 		URIs:     []spotify.URI{t.URI},
 	})
 	if err != nil {
@@ -20,8 +23,11 @@ func playTrack(t *spotify.FullTrack) error {
 }
 
 func playAlbum(a *spotify.SimpleAlbum) error {
+	if err := updateDevice(); err != nil {
+		return err
+	}
 	err := client.PlayOpt(&spotify.PlayOptions{
-		DeviceID:        deviceID,
+		DeviceID:        &device.ID,
 		PlaybackContext: &a.URI,
 		PlaybackOffset:  &spotify.PlaybackOffset{Position: 0},
 	})
@@ -35,8 +41,11 @@ func playAlbum(a *spotify.SimpleAlbum) error {
 }
 
 func playArtist(a *spotify.FullArtist) error {
+	if err := updateDevice(); err != nil {
+		return err
+	}
 	err := client.PlayOpt(&spotify.PlayOptions{
-		DeviceID:        deviceID,
+		DeviceID:        &device.ID,
 		PlaybackContext: &a.URI,
 	})
 	if err != nil {
@@ -49,8 +58,11 @@ func playArtist(a *spotify.FullArtist) error {
 }
 
 func playPlaylist(p *Playlist) error {
+	if err := updateDevice(); err != nil {
+		return err
+	}
 	err := client.PlayOpt(&spotify.PlayOptions{
-		DeviceID:        deviceID,
+		DeviceID:        &device.ID,
 		PlaybackContext: &p.URI,
 		PlaybackOffset:  &spotify.PlaybackOffset{Position: 0},
 	})

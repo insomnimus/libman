@@ -1,0 +1,128 @@
+package control
+
+import (
+	"bufio"
+	"fmt"
+	"github.com/zmb3/spotify"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func readBool(format string, args ...interface{}) bool {
+	for {
+		reply := readString(format+" [y/n]: ", args...)
+		switch strings.ToLower(reply) {
+		case "y", "yes":
+			return true
+		case "n", "no":
+			return false
+		default:
+			fmt.Println("please enter yes or no")
+		}
+	}
+}
+
+func readString(format string, args ...interface{}) string {
+	sc := bufio.NewScanner(os.Stdin)
+	fmt.Printf(format, args...)
+	sc.Scan()
+	reply := strings.TrimSpace(sc.Text())
+	return reply
+}
+
+func splitCmd(s string) (string, string) {
+	firstSpace := strings.Index(s, " ")
+	if firstSpace < 0 {
+		return s, ""
+	}
+
+	return s[:firstSpace], strings.TrimSpace(s[firstSpace:])
+}
+
+func trackQuery(s string) string {
+	if strings.Contains(s, "::") {
+		split := strings.SplitN(s, "::", 2)
+		track := strings.TrimSpace(split[0])
+		if len(split) != 2 {
+			return "track:" + track
+		}
+		artist := strings.TrimSpace(split[1])
+		return fmt.Sprintf("track:%s artist:%s", track, artist)
+	}
+
+	if strings.Contains(s, " by ") {
+		split := strings.SplitN(s, " by ", 2)
+		if len(split) != 2 {
+			return s
+		}
+		track := strings.TrimSpace(split[0])
+		artist := strings.TrimSpace(split[1])
+		return fmt.Sprintf("track:%s artist:%s", track, artist)
+	}
+
+	return s
+}
+
+func albumQuery(s string) string {
+	if strings.Contains(s, "::") {
+		split := strings.SplitN(s, "::", 2)
+		alb := strings.TrimSpace(split[0])
+		if len(split) != 2 {
+			return "album:" + alb
+		}
+		artist := strings.TrimSpace(split[1])
+		return fmt.Sprintf("album:%s artist:%s", alb, artist)
+	}
+
+	if strings.Contains(s, " by ") {
+		split := strings.SplitN(s, " by ", 2)
+		if len(split) != 2 {
+			return s
+		}
+		alb := strings.TrimSpace(split[0])
+		artist := strings.TrimSpace(split[1])
+		return fmt.Sprintf("album:%s artist:%s", alb, artist)
+	}
+
+	return s
+}
+
+func readNumber(min, max int) int {
+	for {
+		reply := readString("[%d-%d, -1 or blank to cancel]: ", min, max)
+		if reply == "" || reply == "-1" {
+			return -1
+		}
+
+		n, err := strconv.Atoi(reply)
+		if err != nil {
+			fmt.Println("invalid input, please enter again")
+			continue
+		}
+
+		if n < min || n >= max {
+			fmt.Printf("please enter a number between %d and %d\n", min, max)
+			continue
+		}
+
+		return n
+	}
+}
+
+func joinArtists(arts []spotify.SimpleArtist) string {
+	switch len(arts) {
+	case 0:
+		return ""
+	case 1:
+		return arts[0].Name
+	case 2:
+		return fmt.Sprintf("%s and %s", arts[0].Name, arts[1].Name)
+	default:
+		names := make([]string, len(arts)-1)
+		for i, a := range arts[:len(arts)-1] {
+			names[i] = a.Name
+		}
+		return fmt.Sprintf("%s and %s", strings.Join(names, ", "), arts[len(arts)-1].Name)
+	}
+}

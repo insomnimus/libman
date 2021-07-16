@@ -1,11 +1,7 @@
 package cmd
 
-type Cmd uint8
-
-//go:generate stringer -type=Cmd
-
 const (
-	_ Cmd = iota
+	_ uint8 = iota
 	Search
 	SearchTrack
 	SearchArtist

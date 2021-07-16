@@ -2,14 +2,13 @@ package handler
 
 import (
 	"fmt"
-	"libman/handler/cmd"
 	"strings"
 )
 
 type Handler struct {
 	Name    string
 	Aliases []string
-	Cmd     cmd.Cmd
+	Cmd     uint8
 	Help    string
 	About   string
 	Usage   string
@@ -18,10 +17,10 @@ type Handler struct {
 
 type Set []Handler
 
-func (s Set) Find(c cmd.Cmd) *Handler {
-	for _, h := range s {
+func (s *Set) Find(c uint8) *Handler {
+	for i, h := range *s {
 		if h.Cmd == c {
-			return &h
+			return &(*s)[i]
 		}
 	}
 	return nil
@@ -47,8 +46,22 @@ usage:
   %s`, h.Name, strings.Join(h.Aliases, ", "), h.Usage, h.Help)
 }
 
-func (s Set) ShowUsage(c cmd.Cmd) {
+func (s Set) ShowUsage(c uint8) {
 	if h := s.Find(c); h != nil {
 		fmt.Printf("usage:\n  %s\n", h.Usage)
 	}
+}
+
+func (s *Set) Match(cmd string) *Handler {
+	for i, h := range *s {
+		if strings.EqualFold(h.Name, cmd) {
+			return &(*s)[i]
+		}
+		for _, alias := range h.Aliases {
+			if strings.EqualFold(alias, cmd) {
+				return &(*s)[i]
+			}
+		}
+	}
+	return nil
 }

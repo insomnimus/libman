@@ -5,7 +5,7 @@ import (
 	"github.com/zmb3/spotify"
 )
 
-func createPlaylist(arg string) error {
+func handleCreatePlaylist(arg string) error {
 	fmt.Println("creating new playlist")
 	if arg == "" {
 		arg = readString("playlist name: ")
@@ -35,7 +35,7 @@ func createPlaylist(arg string) error {
 	return nil
 }
 
-func deletePlaylist(arg string) error {
+func handleDeletePlaylist(arg string) error {
 	pl := choosePlaylist(arg)
 	if pl == nil {
 		return nil
@@ -53,6 +53,9 @@ func deletePlaylist(arg string) error {
 
 	fmt.Printf("deleted %s\n", pl.Name)
 	cache.remove(pl.ID)
+	if lastPl != nil && pl.ID == lastPl.ID {
+		lastPl = nil
+	}
 	return nil
 }
 
@@ -93,4 +96,9 @@ func choosePlaylist(arg string) *Playlist {
 		return nil
 	}
 	return cache.get(n)
+}
+
+func handleEditPlaylist(arg string) error {
+	fmt.Println("unimplemented")
+	return nil
 }

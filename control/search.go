@@ -40,7 +40,7 @@ func searchArtist(q string) ([]spotify.FullArtist, error) {
 	return page.Artists.Artists, nil
 }
 
-func searchPlaylist(q string) ([]spotify.SimplePlaylist, error) {
+func searchPlaylist(q string) ([]Playlist, error) {
 	page, err := client.Search(q, spotify.SearchTypePlaylist)
 	if err != nil {
 		return nil, err
@@ -48,5 +48,10 @@ func searchPlaylist(q string) ([]spotify.SimplePlaylist, error) {
 	if page.Playlists == nil {
 		return nil, nil
 	}
-	return page.Playlists.Playlists, nil
+	pls := make([]Playlist, 0, len(page.Playlists.Playlists))
+	for _, p := range page.Playlists.Playlists {
+		pls = append(pls, plFromSimple(p))
+	}
+
+	return pls, nil
 }

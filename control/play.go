@@ -74,3 +74,17 @@ func playPlaylist(p *Playlist) error {
 	isPlaying = true
 	return nil
 }
+
+func handlePlayUserPlaylist(arg string) error {
+	pl := choosePlaylist(arg)
+	if pl == nil {
+		return nil
+	}
+
+	err := playPlaylist(pl)
+	if err != nil {
+		return err
+	}
+	lastPl = pl
+	return nil
+}

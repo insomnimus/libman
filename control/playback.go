@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/zmb3/spotify"
 	"libman/handler/cmd"
+	"strconv"
 	"strings"
 )
 
@@ -175,5 +176,81 @@ func handleRepeat(arg string) error {
 
 	fmt.Printf("repeat = %s\n", r)
 	repeatState = r
+	return nil
+}
+
+func getPlaying() (*spotify.FullTrack, error) {
+	cp, err := client.PlayerCurrentlyPlaying()
+	if err != nil {
+		return nil, err
+	}
+	isPlaying = cp.Playing
+	if cp.Item == nil {
+		return nil, fmt.Errorf("Not playing a track.")
+	}
+	return cp.Item, nil
+}
+
+func handleVolume(arg string) error {
+	if arg == "" {
+		if device == nil {
+			return fmt.Errorf("No active device detected")
+		}
+		fmt.Printf("The volume is %d%%.\n", device.Volume)
+		return nil
+	}
+
+	n, err := strconv.Atoi(arg)
+	if err != nil {
+		handlers.ShowUsage(cmd.Volume)
+		return nil
+	}
+
+	return setVolume(n)
+}
+
+func handleSetDevice(arg string) error {
+	devs, err := client.PlayerDevices()
+	if err != nil {
+		return err
+	}
+	if len(devs) == 0 {
+		fmt.Println("Couldn't detect any device.")
+		return nil
+	}
+
+	var dev *spotify.PlayerDevice
+	if arg != "" {
+		for _, d := range devs {
+			if strings.EqualFold(d.Name, arg) {
+				dev = &d
+				break
+			}
+		}
+
+		if dev == nil {
+			fmt.Printf("Did not find any device named %s.\n", arg)
+			return nil
+		}
+	} else {
+		for i, d := range devs {
+			fmt.Printf("#%.2d | %s\n", i, d.Name)
+		}
+		n := readNumber(0, len(devs))
+		if n < 0 {
+			fmt.Println("cancelled")
+			return nil
+		}
+		dev = &devs[n]
+	}
+
+	play := isPlaying
+
+	err = client.TransferPlayback(dev.ID, play)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Playing on %s.\n", dev.Name)
+	device = dev
 	return nil
 }

@@ -24,7 +24,7 @@ func handlePFTrack(arg string) error {
 	return playTrack(track)
 }
 
-func handlePlayFAlbum(arg string) error {
+func handlePFAlbum(arg string) error {
 	if arg == "" {
 		handlers.ShowUsage(cmd.PlayFirstAlbum)
 		return nil
@@ -41,7 +41,7 @@ func handlePlayFAlbum(arg string) error {
 	return playAlbum(&albs[0])
 }
 
-func handlePlayFArtist(arg string) error {
+func handlePFArtist(arg string) error {
 	if arg == "" {
 		handlers.ShowUsage(cmd.PlayFirstArtist)
 		return nil
@@ -60,7 +60,7 @@ func handlePlayFArtist(arg string) error {
 	return playArtist(&arts[0])
 }
 
-func handlePlayFPlaylist(arg string) error {
+func handlePFPlaylist(arg string) error {
 	if arg == "" {
 		handlers.ShowUsage(cmd.PlayFirstPlaylist)
 		return nil
@@ -75,7 +75,5 @@ func handlePlayFPlaylist(arg string) error {
 		fmt.Printf("no result for %q", arg)
 		return nil
 	}
-
-	pl := plFromSimple(pls[0])
-	return playPlaylist(&pl)
+	return playPlaylist(&pls[0])
 }

@@ -115,3 +115,38 @@ func (p *Playlist) play() error {
 	lastPl = p
 	return nil
 }
+
+func handleSavePlaying(arg string) error {
+	pl := choosePlaylist(arg)
+	if pl == nil {
+		return nil
+	}
+	t, err := getPlaying()
+	if err != nil {
+		return err
+	}
+	return pl.addTrack(*t)
+}
+
+func handleRemovePlaying(arg string) error {
+	var pl *Playlist
+	if arg == "" {
+		pl = lastPl
+		if pl == nil {
+			fmt.Println("No playlist playback history detected in this session, please specify a playlist name.")
+			return nil
+		}
+	} else {
+		pl = choosePlaylist(arg)
+		if pl == nil {
+			return nil
+		}
+	}
+
+	t, err := getPlaying()
+	if err != nil {
+		return err
+	}
+
+	return pl.removeTrack(*t)
+}

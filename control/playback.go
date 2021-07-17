@@ -76,7 +76,7 @@ func getActiveDevice() (*spotify.PlayerDevice, error) {
 		}
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("no active device detected")
 }
 
 func updateDevice() error {

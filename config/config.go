@@ -32,7 +32,7 @@ func Load(path string) (*Config, error) {
 		if err != nil {
 			return nil, err
 		}
-		data = append([]byte("# libman configuration file\n"), data...)
+
 		return &c, os.WriteFile(path, data, 0600)
 	}
 

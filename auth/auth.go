@@ -49,13 +49,13 @@ func authorize(auth *spotify.Authenticator) (*Creds, error) {
 	// use the client to make calls that require authorization
 	usr, err := clt.CurrentUser()
 	if err != nil {
-		return nil, fmt.Errorf("error auhorizing: %e", err)
+		return nil, fmt.Errorf("error auhorizing: %s", err)
 	}
 	fmt.Println("logged in!")
 
 	token, err := clt.Token()
 	if err != nil {
-		return nil, fmt.Errorf("error fetching user info: %e", err)
+		return nil, fmt.Errorf("error fetching user info: %s", err)
 	}
 
 	return &Creds{
@@ -90,16 +90,18 @@ func Login(c *config.Config) (*Creds, error) {
 
 	// check if the token is cached
 	if c.CacheFile != "" {
-		data, err := os.ReadFile(c.CacheFile)
-		if err != nil {
-			return nil, fmt.Errorf("could not read the cache file: %e", err)
+		if _, err := os.Stat(c.CacheFile); err == nil {
+			data, err := os.ReadFile(c.CacheFile)
+			if err != nil {
+				return nil, fmt.Errorf("could not read the cache file: %s", err)
+			}
+			var token oauth2.Token
+			err = json.Unmarshal(data, &token)
+			if err != nil {
+				return nil, fmt.Errorf("could not unmarshal the cached token: %s", err)
+			}
+			return login(&auth, &token)
 		}
-		var token oauth2.Token
-		err = json.Unmarshal(data, &token)
-		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal the cached token: %e", err)
-		}
-		return login(&auth, &token)
 	}
 
 	// no cache file, prompt for access grant
@@ -110,7 +112,7 @@ func login(auth *spotify.Authenticator, token *oauth2.Token) (*Creds, error) {
 	clt := auth.NewClient(token)
 	usr, err := clt.CurrentUser()
 	if err != nil {
-		return nil, fmt.Errorf("error fetching user details: %e", err)
+		return nil, fmt.Errorf("error fetching user details: %s", err)
 	}
 	fmt.Printf("welcome %s\n", usr.DisplayName)
 	return &Creds{

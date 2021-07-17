@@ -46,15 +46,15 @@ func main() {
 	if c.CacheFile != "" {
 		token, err := creds.Client.Token()
 		if err != nil {
-			log.Fatalf("error retreiving token: %e", err)
+			log.Fatalf("error retreiving token: %s", err)
 		}
 		data, err := json.MarshalIndent(token, "", "\t")
 		if err != nil {
-			log.Fatalf("error serializing token as json: %e", err)
+			log.Fatalf("error serializing token as json: %s", err)
 		}
 		err = os.WriteFile(c.CacheFile, data, 0600)
 		if err != nil {
-			log.Fatalf("error saving the token to the cache file: %e", err)
+			log.Fatalf("error saving the token to the cache file: %s", err)
 		}
 	} else {
 		log.Println("warning: the access token is not saved because no cache file is specified")

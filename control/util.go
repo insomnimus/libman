@@ -1,15 +1,17 @@
 package control
 
 import (
-	"bufio"
+	"errors"
 	"fmt"
-	"github.com/zmb3/spotify"
-	"os"
+	"io"
 	"strconv"
 	"strings"
+
+	"github.com/zmb3/spotify"
 )
 
 func readBool(format string, args ...interface{}) bool {
+	rl.SetCompleter(completeBool)
 	for {
 		reply := readString(format+" [y/n]: ", args...)
 		switch strings.ToLower(reply) {
@@ -24,11 +26,17 @@ func readBool(format string, args ...interface{}) bool {
 }
 
 func readString(format string, args ...interface{}) string {
-	sc := bufio.NewScanner(os.Stdin)
-	fmt.Printf(format, args...)
-	sc.Scan()
-	reply := strings.TrimSpace(sc.Text())
-	return reply
+	reply, err := rl.Prompt(fmt.Sprintf(format, args...))
+	if errors.Is(err, io.EOF) {
+		Terminator <- true
+		for {
+		}
+	}
+	if err != nil {
+		return ""
+	}
+	rl.AppendHistory(reply)
+	return strings.TrimSpace(reply)
 }
 
 func splitCmd(s string) (string, string) {
@@ -125,4 +133,24 @@ func joinArtists(arts []spotify.SimpleArtist) string {
 		}
 		return fmt.Sprintf("%s and %s", strings.Join(names, ", "), arts[len(arts)-1].Name)
 	}
+}
+
+func expandAlias(s string) string {
+	als := userAliases.Inner()
+	if als != nil {
+		lower := strings.ToLower(s)
+		for _, a := range als {
+			left := strings.ToLower(a.Left)
+			if strings.HasPrefix(lower, left) {
+				// must be separated by a space
+				if len(left) == len(s) {
+					return a.Right
+				}
+				if s[len(left)] == ' ' {
+					return fmt.Sprintf("%s %s", a.Right, s[len(left):])
+				}
+			}
+		}
+	}
+	return s
 }

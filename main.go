@@ -7,10 +7,12 @@ import (
 	"libman/control"
 	"log"
 	"os"
-	"os/signal"
+	"strings"
 
 	"github.com/vrischmann/userdir"
 )
+
+const VERSION = "0.2.0"
 
 func main() {
 	log.SetFlags(0)
@@ -29,19 +31,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, os.Interrupt)
-	control.SetHandlers(control.DefaultHandlers())
-
-	go control.Start(creds.Client, creds.User, c.Prompt)
-	<-ch
-
-	// on windows, control + c makes the player switch pause state, do it again
-	if os.PathSeparator == '\\' {
-		control.TogglePlay()
+	// load the commands from the rc file, if it exists
+	var commands []string
+	if c.RCFile != "" {
+		if _, err := os.Stat(c.RCFile); err == nil {
+			data, err := os.ReadFile(c.RCFile)
+			if err != nil {
+				log.Fatalf("error reading from the libman startup script file at %s:\n%s\n", c.RCFile, err)
+			}
+			commands = strings.Split(string(data), "\n")
+		}
 	}
 
+	control.SetHandlers(control.DefaultHandlers())
+	go control.Start(creds.Client, creds.User, c.Prompt, commands)
+	<-control.Terminator
 	// save the token if there's a cache file specified
 	if c.CacheFile != "" {
 		token, err := creds.Client.Token()

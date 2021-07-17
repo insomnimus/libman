@@ -30,4 +30,5 @@ const (
 	SetDevice
 	Show
 	Prompt
+	Alias
 )

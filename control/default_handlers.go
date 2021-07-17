@@ -236,8 +236,17 @@ func DefaultHandlers() []handler.Handler {
 			"Show the currently playing track.",
 			"show",
 			"Show the currently playing track.",
-			[]string{"sw", "ls"},
+			[]string{"sw"},
 			handleShow,
+		),
+		hand(
+			cmd.Alias,
+			"alias",
+			"Define aliases to commands.",
+			"alias <alias>=<command>",
+			"Define aliases to commands.",
+			nil,
+			handleAlias,
 		),
 	}
 }

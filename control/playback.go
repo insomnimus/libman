@@ -234,7 +234,7 @@ func handleSetDevice(arg string) error {
 		}
 	} else {
 		for i, d := range devs {
-			fmt.Printf("#%.2d | %s\n", i, d.Name)
+			fmt.Printf("#%-2d | %s\n", i, d.Name)
 		}
 		n := readNumber(0, len(devs))
 		if n < 0 {

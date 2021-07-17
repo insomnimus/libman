@@ -87,7 +87,7 @@ func choosePlaylist(arg string) *Playlist {
 	}
 
 	for i, p := range *cache {
-		fmt.Printf("%.2d | %s\n", i, p.Name)
+		fmt.Printf("%-2d | %s\n", i, p.Name)
 	}
 
 	n := readNumber(0, len(*cache))

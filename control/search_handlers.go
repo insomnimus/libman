@@ -21,7 +21,7 @@ func handleSTrack(arg string) error {
 
 	// print the results
 	for i, t := range tracks {
-		fmt.Printf("%.2d | %s by %s\n", i, t.Name, joinArtists(t.Artists))
+		fmt.Printf("%-2d | %s by %s\n", i, t.Name, joinArtists(t.Artists))
 	}
 
 	n := readNumber(0, len(tracks))

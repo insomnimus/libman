@@ -1,103 +1,62 @@
 package main
 
 import (
-	"fmt"
-	"github.com/zmb3/spotify"
-	"golang.org/x/oauth2"
+	"encoding/json"
+	"libman/auth"
+	"libman/config"
 	"libman/control"
 	"log"
-	"net/http"
 	"os"
+	"os/signal"
+
+	"github.com/vrischmann/userdir"
 )
-
-var (
-	redirectURI  = os.Getenv("LIBMAN_REDIRECT_URI")
-	clientID     = os.Getenv("LIBMAN_ID")
-	clientSecret = os.Getenv("LIBMAN_SECRET")
-	state        = "xyz987"
-	ch           = make(chan *spotify.Client)
-
-	// all the permissions
-	auth = spotify.NewAuthenticator(redirectURI,
-		spotify.ScopeImageUpload,
-		spotify.ScopePlaylistReadPrivate,
-		spotify.ScopePlaylistModifyPublic,
-		spotify.ScopePlaylistModifyPrivate,
-		spotify.ScopePlaylistReadCollaborative,
-		spotify.ScopeUserFollowModify,
-		spotify.ScopeUserFollowRead,
-		spotify.ScopeUserLibraryModify,
-		spotify.ScopeUserLibraryRead,
-		spotify.ScopeUserReadPrivate,
-		spotify.ScopeUserReadEmail,
-		spotify.ScopeUserReadCurrentlyPlaying,
-		spotify.ScopeUserReadPlaybackState,
-		spotify.ScopeUserModifyPlaybackState,
-		spotify.ScopeUserReadRecentlyPlayed,
-		spotify.ScopeUserTopRead,
-		spotify.ScopeStreaming,
-	)
-)
-
-func completeAuth(w http.ResponseWriter, r *http.Request) {
-	tok, err := auth.Token(state, r)
-	if err != nil {
-		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
-	}
-	if st := r.FormValue("state"); st != state {
-		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
-	}
-	// use the token to get an authenticated client
-	client := auth.NewClient(tok)
-	fmt.Fprintf(w, "Login Completed!")
-	ch <- &client
-}
-
-func authorize() (*spotify.Client, *spotify.PrivateUser, *oauth2.Token) {
-
-	http.HandleFunc("/callback", completeAuth)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		//log.Println("Got request for:", r.URL.String())
-	})
-	go http.ListenAndServe(":8080", nil)
-
-	url := auth.AuthURL(state)
-	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
-	// wait for auth to complete
-	clt := <-ch
-
-	// use the client to make calls that require authorization
-	usr, err := clt.CurrentUser()
-	if err != nil {
-		log.Fatalf("error authorizing: %s\n", err)
-	}
-	fmt.Println("logged in!")
-
-	token, err := clt.Token()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return clt, usr, token
-}
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("")
 
-	if clientID == "" {
-		log.Fatal("error: the LIBMAN_ID env variable must be set")
+	path := os.Getenv("LIBMAN_CONFIG_PATH")
+	if path == "" {
+		path = userdir.GetDataHome()
 	}
-	if clientSecret == "" {
-		log.Fatal("error: the LIBMAN_SECRET env variable must be set")
-	}
-	if redirectURI == "" {
-		log.Fatal("error: the LIBMAN_REDIRECT_URI env variable must be set")
-	}
-	auth.SetAuthInfo(clientID, clientSecret)
 
-	client, user, _ := authorize()
+	c, err := config.Load(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	creds, err := auth.Login(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, os.Interrupt)
 	control.SetHandlers(control.DefaultHandlers())
-	control.Start(client, user, "@libman>")
+
+	go control.Start(creds.Client, creds.User, c.Prompt)
+	<-ch
+
+	// on windows, control + c makes the player switch pause state, do it again
+	if os.PathSeparator == '\\' {
+		control.TogglePlay()
+	}
+
+	// save the token if there's a cache file specified
+	if c.CacheFile != "" {
+		token, err := creds.Client.Token()
+		if err != nil {
+			log.Fatalf("error retreiving token: %e", err)
+		}
+		data, err := json.MarshalIndent(token, "", "\t")
+		if err != nil {
+			log.Fatalf("error serializing token as json: %e", err)
+		}
+		err = os.WriteFile(c.CacheFile, data, 0600)
+		if err != nil {
+			log.Fatalf("error saving the token to the cache file: %e", err)
+		}
+	} else {
+		log.Println("warning: the access token is not saved because no cache file is specified")
+	}
 }

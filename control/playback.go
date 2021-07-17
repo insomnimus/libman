@@ -276,3 +276,9 @@ func handleShow(arg string) error {
 	}
 	return nil
 }
+
+// only for windows, during exits the playback is toggled
+// so to toggle it back, export the func
+func TogglePlay() error {
+	return togglePlay()
+}

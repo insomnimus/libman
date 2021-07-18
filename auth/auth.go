@@ -3,9 +3,9 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/insomnimus/libman/config"
 	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
-	"libman/config"
 	"log"
 	"net/http"
 	"os"

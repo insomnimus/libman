@@ -2,7 +2,7 @@ package control
 
 import (
 	"fmt"
-	"libman/handler/cmd"
+	"github.com/insomnimus/libman/handler/cmd"
 )
 
 func handleSTrack(arg string) error {

@@ -25,18 +25,23 @@ func readBool(format string, args ...interface{}) bool {
 	}
 }
 
-func readString(format string, args ...interface{}) string {
-	reply, err := rl.Prompt(fmt.Sprintf(format, args...))
+func readPrompt(format string, args ...interface{}) (reply string, cancelled bool) {
+	var err error
+	reply, err = rl.Prompt(fmt.Sprintf(format, args...))
 	if errors.Is(err, io.EOF) {
 		Terminator <- true
-		for {
-		}
+		select {}
 	}
 	if err != nil {
-		return ""
+		return "", true
 	}
 	rl.AppendHistory(reply)
-	return strings.TrimSpace(reply)
+	return strings.TrimSpace(reply), false
+}
+
+func readString(format string, args ...interface{}) string {
+	reply, _ := readPrompt(format, args...)
+	return reply
 }
 
 func splitCmd(s string) (string, string) {

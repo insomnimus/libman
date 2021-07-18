@@ -2,8 +2,8 @@ package control
 
 import (
 	"fmt"
+	"github.com/insomnimus/libman/handler/cmd"
 	"github.com/zmb3/spotify"
-	"libman/handler/cmd"
 	"strconv"
 	"strings"
 )
@@ -281,4 +281,9 @@ func handleShow(arg string) error {
 // so to toggle it back, export the func
 func TogglePlay() error {
 	return togglePlay()
+}
+
+func handleSharePlaying(arg string) error {
+	fmt.Println("Not yet implemented.")
+	return nil
 }

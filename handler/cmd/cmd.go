@@ -31,4 +31,5 @@ const (
 	Show
 	Prompt
 	Alias
+	Share
 )

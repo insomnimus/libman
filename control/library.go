@@ -6,6 +6,7 @@ import (
 )
 
 func handleCreatePlaylist(arg string) error {
+	rl.SetCompleter(completeNothing)
 	fmt.Println("creating new playlist")
 	if arg == "" {
 		arg = readString("playlist name: ")

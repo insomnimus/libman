@@ -2,9 +2,9 @@ package control
 
 import (
 	"fmt"
+	"github.com/insomnimus/libman/alias"
+	"github.com/insomnimus/libman/handler"
 	"github.com/zmb3/spotify"
-	"libman/alias"
-	"libman/handler"
 	"regexp"
 	"strconv"
 	"strings"
@@ -74,9 +74,13 @@ func Start(
 
 	var input string
 	var err error
+	var cancelled bool
 	for {
 		rl.SetCompleter(completeCommand)
-		input = readString(prompt + " ")
+		input, cancelled = readPrompt(prompt + " ")
+		if cancelled {
+			continue
+		}
 		input = expandAlias(input)
 		if input == "" {
 			err = togglePlay()

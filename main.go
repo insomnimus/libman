@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"libman/auth"
-	"libman/config"
-	"libman/control"
+	"github.com/insomnimus/libman/auth"
+	"github.com/insomnimus/libman/config"
+	"github.com/insomnimus/libman/control"
 	"log"
 	"os"
 	"strings"
@@ -12,7 +12,7 @@ import (
 	"github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.3.1"
+const VERSION = "0.4.0"
 
 func main() {
 	log.SetFlags(0)
@@ -20,7 +20,7 @@ func main() {
 
 	path := os.Getenv("LIBMAN_CONFIG_PATH")
 	if path == "" {
-		path = userdir.GetDataHome()
+		path = userdir.GetConfigHome() + "libman.toml"
 	}
 
 	c, err := config.Load(path)

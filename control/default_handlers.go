@@ -1,8 +1,8 @@
 package control
 
 import (
-	"libman/handler"
-	"libman/handler/cmd"
+	"github.com/insomnimus/libman/handler"
+	"github.com/insomnimus/libman/handler/cmd"
 )
 
 func DefaultHandlers() []handler.Handler {
@@ -247,6 +247,15 @@ func DefaultHandlers() []handler.Handler {
 			"Define aliases to commands.",
 			nil,
 			handleAlias,
+		),
+		hand(
+			cmd.Share,
+			"share-playing",
+			"Copy the link to the currently playing track.",
+			"share-playing",
+			"Copy the link to the currently playing track to your clipboard.",
+			[]string{"share", "cp"},
+			handleSharePlaying,
 		),
 	}
 }

@@ -7,12 +7,13 @@ import (
 	"github.com/insomnimus/libman/control"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.4.0"
+const VERSION = "0.4.1"
 
 func main() {
 	log.SetFlags(0)
@@ -20,7 +21,7 @@ func main() {
 
 	path := os.Getenv("LIBMAN_CONFIG_PATH")
 	if path == "" {
-		path = userdir.GetConfigHome() + "libman.toml"
+		path = filepath.Join(userdir.GetConfigHome(), "libman.toml")
 	}
 
 	c, err := config.Load(path)

@@ -78,6 +78,9 @@ func (s *Set) Len() int {
 }
 
 func (h *Handler) HasPrefix(s string) bool {
+	if strings.TrimSpace(s) == "" {
+		return false
+	}
 	s = strings.ToLower(s)
 	if strings.HasPrefix(h.Name, s) {
 		return true

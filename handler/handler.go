@@ -6,13 +6,14 @@ import (
 )
 
 type Handler struct {
-	Name    string
-	Aliases []string
-	Cmd     uint8
-	Help    string
-	About   string
-	Usage   string
-	Run     func(string) error
+	Name     string
+	Aliases  []string
+	Cmd      uint8
+	Help     string
+	About    string
+	Usage    string
+	Run      func(string) error
+	Complete func(string) []string
 }
 
 type Set []Handler

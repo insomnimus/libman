@@ -9,11 +9,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/vrischmann/userdir"
+	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.4.1"
+const VERSION = "0.4.2"
 
 func main() {
 	log.SetFlags(0)
@@ -21,7 +20,11 @@ func main() {
 
 	path := os.Getenv("LIBMAN_CONFIG_PATH")
 	if path == "" {
-		path = filepath.Join(userdir.GetConfigHome(), "libman.toml")
+		cfg, err := os.UserConfigDir()
+		if err != nil {
+			log.Fatalf("error: could not determine user config dir: %s\n", err)
+		}
+		path = filepath.Join(cfg, "libman.toml")
 	}
 
 	c, err := config.Load(path)

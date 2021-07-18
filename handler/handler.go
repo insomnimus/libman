@@ -54,14 +54,40 @@ func (s Set) ShowUsage(c uint8) {
 
 func (s *Set) Match(cmd string) *Handler {
 	for i, h := range *s {
-		if strings.EqualFold(h.Name, cmd) {
+		if h.Matches(cmd) {
 			return &(*s)[i]
-		}
-		for _, alias := range h.Aliases {
-			if strings.EqualFold(alias, cmd) {
-				return &(*s)[i]
-			}
 		}
 	}
 	return nil
+}
+
+func (h *Handler) Matches(s string) bool {
+	if strings.EqualFold(h.Name, s) {
+		return true
+	}
+	for _, a := range h.Aliases {
+		if strings.EqualFold(a, s) {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Set) Len() int {
+	return len(*s)
+}
+
+func (h *Handler) HasPrefix(s string) bool {
+	s = strings.ToLower(s)
+	if strings.HasPrefix(h.Name, s) {
+		return true
+	}
+
+	for _, a := range h.Aliases {
+		if strings.HasPrefix(s, a) {
+			return true
+		}
+	}
+
+	return false
 }

@@ -1,6 +1,8 @@
 package control
 
 import (
+	"fmt"
+	"libman/handler/cmd"
 	"strings"
 )
 
@@ -15,6 +17,12 @@ func completeCommand(buf string) (c []string) {
 
 	// check handlers
 	for _, h := range handlers {
+		// check if the line is a playlist command
+		if (h.Cmd == cmd.PlayUserPlaylist || h.Cmd == cmd.DeletePlaylist || h.Cmd == cmd.EditPlaylist) &&
+			h.HasPrefix(buf) {
+			return suggestPlaylist(buf)
+		}
+
 		if strings.HasPrefix(h.Name, buf) {
 			c = append(c, h.Name)
 			continue
@@ -44,4 +52,28 @@ func completeBool(buf string) (c []string) {
 
 func completeNothing(string) []string {
 	return nil
+}
+
+func suggestPlaylist(buf string) []string {
+	updateCache()
+	pls := make([]string, 0, len(*cache))
+	buf = strings.ToLower(buf)
+	command, name := splitCmd(buf)
+
+	if name == "" {
+		// return all playlist names
+		for _, p := range *cache {
+			pls = append(pls,
+				fmt.Sprintf("%s %s", command, p.Name))
+		}
+		return pls
+	}
+
+	for _, p := range *cache {
+		if strings.HasPrefix(strings.ToLower(p.Name), name) {
+			pls = append(pls,
+				fmt.Sprintf("%s %s", command, p.Name))
+		}
+	}
+	return pls
 }

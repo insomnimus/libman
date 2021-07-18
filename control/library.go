@@ -61,16 +61,10 @@ func handleDeletePlaylist(arg string) error {
 
 func choosePlaylist(arg string) *Playlist {
 	// if the cache is nil, initialize it
-	if cache == nil {
-		page, err := client.CurrentUsersPlaylists()
-		if err != nil {
-			fmt.Println("error fetching user playlists: ", err)
-			return nil
-		}
-		cache = new(PlaylistCache)
-		for _, p := range page.Playlists {
-			cache.pushSimple(p)
-		}
+	err := updateCache()
+	if err != nil {
+		fmt.Printf("Error updating playlist cache: %s.\n", err)
+		return nil
 	}
 
 	if len(*cache) == 0 {
@@ -104,4 +98,18 @@ func handleEditPlaylist(arg string) error {
 		return nil
 	}
 	return pl.editDetails()
+}
+
+func updateCache() error {
+	if cache == nil {
+		page, err := client.CurrentUsersPlaylists()
+		if err != nil {
+			return err
+		}
+		cache = new(PlaylistCache)
+		for _, p := range page.Playlists {
+			cache.pushSimple(p)
+		}
+	}
+	return nil
 }

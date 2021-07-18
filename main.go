@@ -12,7 +12,7 @@ import (
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.4.2"
+const VERSION = "0.4.3"
 
 func main() {
 	log.SetFlags(0)
@@ -47,7 +47,6 @@ func main() {
 		}
 	}
 
-	control.SetHandlers(control.DefaultHandlers())
 	go control.Start(creds.Client, creds.User, c.Prompt, commands)
 	<-control.Terminator
 	// save the token if there's a cache file specified

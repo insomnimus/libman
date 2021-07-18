@@ -32,8 +32,8 @@ var (
 	Terminator = make(chan bool, 1)
 )
 
-func SetHandlers(h handler.Set) {
-	handlers = h
+func init() {
+	handlers = DefaultHandlers()
 }
 
 func Start(

@@ -5,20 +5,21 @@ import (
 	"github.com/insomnimus/libman/handler/cmd"
 )
 
-func DefaultHandlers() []handler.Handler {
+func DefaultHandlers() handler.Set {
 	hand := func(c uint8, name, about, usage, help string, aliases []string, fn func(string) error) handler.Handler {
 		return handler.Handler{
-			Cmd:     c,
-			Name:    name,
-			About:   about,
-			Usage:   usage,
-			Help:    help,
-			Aliases: aliases,
-			Run:     fn,
+			Cmd:      c,
+			Name:     name,
+			About:    about,
+			Usage:    usage,
+			Help:     help,
+			Aliases:  aliases,
+			Run:      fn,
+			Complete: completeNothing,
 		}
 	}
 
-	return []handler.Handler{
+	return handler.Set{
 		// library commands
 		hand(
 			cmd.SavePlaying,

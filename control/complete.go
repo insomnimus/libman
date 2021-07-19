@@ -77,3 +77,19 @@ func suggestPlaylist(buf string) []string {
 	}
 	return pls
 }
+
+func newCompleter(cand []string) func(string) []string {
+	return func(buf string) []string {
+		items := make([]string, 0, len(cand))
+		for _, s := range cand {
+			if hasPrefixFold(s, buf) {
+				items = append(items, s)
+			}
+		}
+		// we want to return nil in case of no match
+		if len(items) == 0 {
+			return nil
+		}
+		return items
+	}
+}

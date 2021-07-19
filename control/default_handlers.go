@@ -260,3 +260,11 @@ func DefaultHandlers() handler.Set {
 		),
 	}
 }
+
+func _applyCompletePlaylist(set handler.Set) {
+	set.Find(cmd.PlayUserPlaylist).Complete = suggestPlaylist
+	set.Find(cmd.SavePlaying).Complete = suggestPlaylist
+	set.Find(cmd.RemovePlaying).Complete = suggestPlaylist
+	set.Find(cmd.EditPlaylist).Complete = suggestPlaylist
+	set.Find(cmd.DeletePlaylist).Complete = suggestPlaylist
+}

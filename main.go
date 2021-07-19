@@ -12,7 +12,7 @@ import (
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.4.3"
+const VERSION = "0.4.4"
 
 func main() {
 	log.SetFlags(0)

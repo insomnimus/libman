@@ -6,6 +6,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/zmb3/spotify"
 )
@@ -158,4 +159,21 @@ func expandAlias(s string) string {
 		}
 	}
 	return s
+}
+
+func hasPrefixFold(a, b string) bool {
+	x := []rune(a)
+	y := []rune(b)
+	if len(x) < len(y) {
+		return false
+	}
+	for i, c := range y {
+		if x[i] == c {
+			continue
+		}
+		if unicode.ToUpper(c) != unicode.ToUpper(x[i]) {
+			return false
+		}
+	}
+	return true
 }

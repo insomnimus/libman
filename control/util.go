@@ -3,12 +3,18 @@ package control
 import (
 	"errors"
 	"fmt"
+	"github.com/insomnimus/libman/util"
 	"io"
 	"strconv"
 	"strings"
-	"unicode"
 
 	"github.com/zmb3/spotify"
+)
+
+// aliases for compatibility
+var (
+	hasPrefixFold = util.HasPrefixFold
+	splitCmd      = util.SplitCmd
 )
 
 func readBool(format string, args ...interface{}) bool {
@@ -45,15 +51,6 @@ func readPrompt(addToHistory bool, format string, args ...interface{}) (reply st
 func readString(format string, args ...interface{}) string {
 	reply, _ := readPrompt(false, format, args...)
 	return reply
-}
-
-func splitCmd(s string) (string, string) {
-	firstSpace := strings.Index(s, " ")
-	if firstSpace < 0 {
-		return s, ""
-	}
-
-	return s[:firstSpace], strings.TrimSpace(s[firstSpace:])
 }
 
 func trackQuery(s string) string {
@@ -161,21 +158,4 @@ func expandAlias(s string) string {
 		}
 	}
 	return s
-}
-
-func hasPrefixFold(a, b string) bool {
-	x := []rune(a)
-	y := []rune(b)
-	if len(x) < len(y) {
-		return false
-	}
-	for i, c := range y {
-		if x[i] == c {
-			continue
-		}
-		if unicode.ToUpper(c) != unicode.ToUpper(x[i]) {
-			return false
-		}
-	}
-	return true
 }

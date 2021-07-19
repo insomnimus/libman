@@ -26,7 +26,7 @@ func readBool(format string, args ...interface{}) bool {
 	}
 }
 
-func readPrompt(format string, args ...interface{}) (reply string, cancelled bool) {
+func readPrompt(addToHistory bool, format string, args ...interface{}) (reply string, cancelled bool) {
 	var err error
 	reply, err = rl.Prompt(fmt.Sprintf(format, args...))
 	if errors.Is(err, io.EOF) {
@@ -36,12 +36,14 @@ func readPrompt(format string, args ...interface{}) (reply string, cancelled boo
 	if err != nil {
 		return "", true
 	}
-	rl.AppendHistory(reply)
+	if addToHistory {
+		rl.AppendHistory(reply)
+	}
 	return strings.TrimSpace(reply), false
 }
 
 func readString(format string, args ...interface{}) string {
-	reply, _ := readPrompt(format, args...)
+	reply, _ := readPrompt(false, format, args...)
 	return reply
 }
 

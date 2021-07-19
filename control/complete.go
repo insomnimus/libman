@@ -88,6 +88,8 @@ func suggestPlaylist(buf string) []string {
 	return pls
 }
 
+// generates a completer for the second word of a command
+// will return nil if the command is not a match of given command names (commands parameter)
 func newWordCompleter(cand []string, commands ...string) func(string) []string {
 	return func(buf string) []string {
 		command, arg := splitCmd(buf)

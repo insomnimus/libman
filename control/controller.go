@@ -77,7 +77,7 @@ func Start(
 	var cancelled bool
 	for {
 		rl.SetCompleter(completeCommand)
-		input, cancelled = readPrompt(prompt + " ")
+		input, cancelled = readPrompt(true, prompt+" ")
 		if cancelled {
 			continue
 		}

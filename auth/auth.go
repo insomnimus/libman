@@ -3,12 +3,13 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/insomnimus/libman/config"
-	"github.com/zmb3/spotify"
-	"golang.org/x/oauth2"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/insomnimus/libman/config"
+	"github.com/zmb3/spotify"
+	"golang.org/x/oauth2"
 )
 
 const state = "xyz987"
@@ -38,7 +39,7 @@ func authorize(auth *spotify.Authenticator) (*Creds, error) {
 	}
 	http.HandleFunc("/callback", completeAuth)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		//log.Println("Got request for:", r.URL.String())
+		// log.Println("Got request for:", r.URL.String())
 	})
 	go http.ListenAndServe(":8080", nil)
 

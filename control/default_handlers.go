@@ -1,9 +1,10 @@
 package control
 
 import (
+	"sort"
+
 	"github.com/insomnimus/libman/handler"
 	"github.com/insomnimus/libman/handler/cmd"
-	"sort"
 )
 
 func DefaultHandlers() handler.Set {

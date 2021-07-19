@@ -2,13 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/insomnimus/libman/auth"
-	"github.com/insomnimus/libman/config"
-	"github.com/insomnimus/libman/control"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/insomnimus/libman/auth"
+	"github.com/insomnimus/libman/config"
+	"github.com/insomnimus/libman/control"
 	// "github.com/vrischmann/userdir"
 )
 
@@ -59,7 +60,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("error serializing token as json: %s", err)
 		}
-		err = os.WriteFile(c.CacheFile, data, 0600)
+		err = os.WriteFile(c.CacheFile, data, 0o600)
 		if err != nil {
 			log.Fatalf("error saving the token to the cache file: %s", err)
 		}

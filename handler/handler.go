@@ -2,8 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"github.com/insomnimus/libman/util"
 	"strings"
+
+	"github.com/insomnimus/libman/util"
 )
 
 type Handler struct {

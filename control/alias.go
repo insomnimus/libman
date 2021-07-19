@@ -2,8 +2,9 @@ package control
 
 import (
 	"fmt"
-	"github.com/insomnimus/libman/handler/cmd"
 	"strings"
+
+	"github.com/insomnimus/libman/handler/cmd"
 )
 
 func handleAlias(arg string) error {
@@ -48,5 +49,4 @@ func handleAlias(arg string) error {
 		userAliases.Set(left, right)
 	}
 	return nil
-
 }

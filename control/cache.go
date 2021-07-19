@@ -1,8 +1,9 @@
 package control
 
 import (
-	"github.com/zmb3/spotify"
 	"strings"
+
+	"github.com/zmb3/spotify"
 )
 
 type Playlist struct {
@@ -27,7 +28,8 @@ func (c *PlaylistCache) insertFull(index int, p spotify.FullPlaylist) {
 
 func (c *PlaylistCache) insertSimple(index int, p spotify.SimplePlaylist) {
 	left := append((*c)[:index], Playlist{
-		spotify.FullPlaylist{SimplePlaylist: p}, false})
+		spotify.FullPlaylist{SimplePlaylist: p}, false,
+	})
 	right := (*c)[index:]
 	*c = append(left, right...)
 }

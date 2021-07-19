@@ -2,8 +2,9 @@ package control
 
 import (
 	"fmt"
-	"github.com/zmb3/spotify"
 	"strconv"
+
+	"github.com/zmb3/spotify"
 )
 
 func handleCreatePlaylist(arg string) error {

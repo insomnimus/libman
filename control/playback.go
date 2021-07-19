@@ -2,10 +2,12 @@ package control
 
 import (
 	"fmt"
-	"github.com/insomnimus/libman/handler/cmd"
-	"github.com/zmb3/spotify"
 	"strconv"
 	"strings"
+
+	"github.com/atotto/clipboard"
+	"github.com/insomnimus/libman/handler/cmd"
+	"github.com/zmb3/spotify"
 )
 
 func togglePlay() error {
@@ -169,7 +171,6 @@ func handleRepeat(arg string) error {
 	err := client.RepeatOpt(r, &spotify.PlayOptions{
 		DeviceID: &device.ID,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -284,6 +285,24 @@ func TogglePlay() error {
 }
 
 func handleSharePlaying(arg string) error {
-	fmt.Println("Not yet implemented.")
+	if err := updateDevice(); err != nil {
+		return err
+	}
+	state, err := client.PlayerState()
+	if err != nil {
+		return err
+	}
+	t := state.Item
+
+	if t == nil {
+		fmt.Println("Not playing a track.")
+	} else {
+		err = clipboard.WriteAll(t.ExternalURLs["spotify"])
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Copied the URL of %s [%s] by %s to the clipboard.\n", t.Name, t.Album.Name, joinArtists(t.Artists))
+		// fmt.Printf("shuffle = %t\nrepeat = %s\n", shuffleState, repeatState)
+	}
 	return nil
 }

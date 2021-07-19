@@ -2,12 +2,13 @@ package control
 
 import (
 	"fmt"
-	"github.com/insomnimus/libman/alias"
-	"github.com/insomnimus/libman/handler"
-	"github.com/zmb3/spotify"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/insomnimus/libman/alias"
+	"github.com/insomnimus/libman/handler"
+	"github.com/zmb3/spotify"
 
 	"github.com/peterh/liner"
 )

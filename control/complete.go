@@ -2,8 +2,9 @@ package control
 
 import (
 	"fmt"
-	"github.com/insomnimus/libman/handler/cmd"
 	"strings"
+
+	"github.com/insomnimus/libman/handler/cmd"
 )
 
 func completeCommand(buf string) (c []string) {
@@ -45,7 +46,6 @@ func completeBool(buf string) (c []string) {
 		c = []string{"no"}
 	}
 	return c
-
 }
 
 func completeNothing(string) []string {

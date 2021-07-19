@@ -3,10 +3,11 @@ package control
 import (
 	"errors"
 	"fmt"
-	"github.com/insomnimus/libman/util"
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/insomnimus/libman/util"
 
 	"github.com/zmb3/spotify"
 )

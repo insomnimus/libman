@@ -40,7 +40,7 @@ func Load(path string) (*Config, error) {
 		}
 		data = append([]byte("# libman configuration file\n"), data...)
 
-		return &c, os.WriteFile(path, data, 0600)
+		return &c, os.WriteFile(path, data, 0o600)
 	}
 
 	data, err := os.ReadFile(path)

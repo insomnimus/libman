@@ -2,6 +2,7 @@ package control
 
 import (
 	"fmt"
+
 	"github.com/insomnimus/libman/handler/cmd"
 )
 

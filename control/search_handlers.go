@@ -87,7 +87,6 @@ func handleSPlaylist(arg string) error {
 		handlers.ShowUsage(cmd.SearchPlaylist)
 		return nil
 	}
-
 	pls, err := searchPlaylist(arg)
 	if err != nil {
 		return err
@@ -96,10 +95,6 @@ func handleSPlaylist(arg string) error {
 	if len(pls) == 0 {
 		fmt.Printf("No result for %s.\n", arg)
 		return nil
-	}
-
-	for i, p := range pls {
-		fmt.Printf("#%3d | %s from %s\n", i, p.Name, p.Owner.DisplayName)
 	}
 
 	n := readNumber(0, len(pls))

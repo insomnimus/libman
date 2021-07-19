@@ -62,28 +62,6 @@ func handleDeletePlaylist(arg string) error {
 	return nil
 }
 
-func handleEditPlaylist(arg string) error {
-	pl := choosePlaylist(arg)
-	if pl == nil {
-		return nil
-	}
-	return pl.editDetails()
-}
-
-func updateCache() error {
-	if cache == nil {
-		page, err := client.CurrentUsersPlaylists()
-		if err != nil {
-			return err
-		}
-		cache = new(PlaylistCache)
-		for _, p := range page.Playlists {
-			cache.pushSimple(p)
-		}
-	}
-	return nil
-}
-
 func choosePlaylist(arg string) *Playlist {
 	// if the cache is nil, initialize it
 	err := updateCache()
@@ -105,10 +83,6 @@ func choosePlaylist(arg string) *Playlist {
 		return pl
 	}
 
-	if len(*cache) > PlaylistPageSize {
-		return _pagePlaylist()
-	}
-
 	for i, p := range *cache {
 		fmt.Printf("%-2d | %s\n", i, p.Name)
 	}
@@ -121,70 +95,24 @@ func choosePlaylist(arg string) *Playlist {
 	return cache.get(n)
 }
 
-func _pagePlaylist() *Playlist {
-	var page int
-	nextPage := func() {
-		page++
-		startFrom := page * PlaylistPageSize
-		if startFrom < len(*cache) {
-			fmt.Println("Already on the last page.")
-			page--
-			return
+func handleEditPlaylist(arg string) error {
+	pl := choosePlaylist(arg)
+	if pl == nil {
+		return nil
+	}
+	return pl.editDetails()
+}
+
+func updateCache() error {
+	if cache == nil {
+		page, err := client.CurrentUsersPlaylists()
+		if err != nil {
+			return err
 		}
-		upTo := (page + 1) * PlaylistPageSize
-		if upTo > len(*cache) {
-			upTo = len(*cache)
-		}
-		for i, p := range (*cache)[startFrom:upTo] {
-			fmt.Printf("#%3d | %s\n", startFrom+i, p.Name)
+		cache = new(PlaylistCache)
+		for _, p := range page.Playlists {
+			cache.pushSimple(p)
 		}
 	}
-
-	prevPage := func() {
-		if page == 0 {
-			fmt.Println("Already on the first page.")
-			return
-		}
-		page--
-		startFrom := page * PlaylistPageSize
-		upTo := startFrom + 1
-		if upTo > len(*cache) {
-			upTo = len(*cache)
-		}
-
-		for i, p := range (*cache)[startFrom:upTo] {
-			fmt.Printf("#%3d | %s\n", i+startFrom, p.Name)
-		}
-	}
-	page = -1
-	nextPage()
-	fmt.Println("Type `<` and `>` for the prev/next pages.")
-
-	for {
-		startFrom := page * PlaylistPageSize
-		upTo := startFrom + PlaylistPageSize
-		if upTo > len(*cache) {
-			upTo = len(*cache)
-		}
-		text := readString("[%d-%d, blank to cancel]: ", startFrom, upTo)
-		if text == ">" {
-			nextPage()
-		} else if text == "<" {
-			prevPage()
-		} else if text == "" {
-			fmt.Println("cancelled")
-			return nil
-		} else {
-			n, err := strconv.Atoi(text)
-			if err != nil {
-				fmt.Printf("Please enter a value between %d and %d, blank to cancel and <> for paging.\n", startFrom, upTo)
-				continue
-			}
-			if n < startFrom || n >= upTo {
-				fmt.Printf("Please enter a value between %d and %d.\n", startFrom, upTo)
-				continue
-			}
-			return cache.get(n)
-		}
-	}
+	return nil
 }

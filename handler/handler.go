@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/insomnimus/libman/util"
 	"strings"
 )
 
@@ -82,13 +83,13 @@ func (h *Handler) HasPrefix(s string) bool {
 	if strings.TrimSpace(s) == "" {
 		return false
 	}
-	s = strings.ToLower(s)
-	if strings.HasPrefix(h.Name, s) {
+
+	if util.HasPrefixFold(h.Name, s) {
 		return true
 	}
 
 	for _, a := range h.Aliases {
-		if strings.HasPrefix(s, a) {
+		if util.HasPrefixFold(s, a) {
 			return true
 		}
 	}

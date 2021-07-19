@@ -3,6 +3,7 @@ package control
 import (
 	"github.com/insomnimus/libman/handler"
 	"github.com/insomnimus/libman/handler/cmd"
+	"sort"
 )
 
 func DefaultHandlers() handler.Set {
@@ -19,7 +20,7 @@ func DefaultHandlers() handler.Set {
 		}
 	}
 
-	return handler.Set{
+	set := handler.Set{
 		// library commands
 		hand(
 			cmd.SavePlaying,
@@ -259,12 +260,35 @@ func DefaultHandlers() handler.Set {
 			handleSharePlaying,
 		),
 	}
+
+	_applySuggestPlaylist(set)
+	_applySuggestShuffleAndRepeat(set)
+	_applySuggestHelp(set)
+
+	return set
 }
 
-func _applyCompletePlaylist(set handler.Set) {
+func _applySuggestPlaylist(set handler.Set) {
 	set.Find(cmd.PlayUserPlaylist).Complete = suggestPlaylist
 	set.Find(cmd.SavePlaying).Complete = suggestPlaylist
 	set.Find(cmd.RemovePlaying).Complete = suggestPlaylist
 	set.Find(cmd.EditPlaylist).Complete = suggestPlaylist
 	set.Find(cmd.DeletePlaylist).Complete = suggestPlaylist
+}
+
+func _applySuggestShuffleAndRepeat(set handler.Set) {
+	set.Find(cmd.Shuffle).Complete = newWordCompleter([]string{"on", "off"}, "sh", "shuffle")
+	set.Find(cmd.Repeat).Complete = newWordCompleter([]string{"off", "track", "context"}, "rep", "repeat")
+}
+
+func _applySuggestHelp(set handler.Set) {
+	topics := make([]string, 0, len(set))
+	for _, h := range set {
+		topics = append(topics, h.Name)
+		for _, a := range h.Aliases {
+			topics = append(topics, a)
+		}
+	}
+	sort.Strings(topics)
+	set.Find(cmd.Help).Complete = newWordCompleter(topics, "help")
 }

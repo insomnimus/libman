@@ -7,31 +7,29 @@ import (
 )
 
 func completeCommand(buf string) (c []string) {
-	buf = strings.ToLower(buf)
 	// first check aliases
 	for _, a := range userAliases.Inner() {
-		if strings.HasPrefix(strings.ToLower(a.Left), buf) {
+		if hasPrefixFold(a.Left, buf) {
 			c = append(c, a.Left)
 		}
 	}
-
+	hasSpace := strings.Contains(buf, " ")
 	// check handlers
 	for _, h := range handlers {
-		// check if the line is a playlist command
-		if (h.Cmd == cmd.PlayUserPlaylist || h.Cmd == cmd.DeletePlaylist || h.Cmd == cmd.EditPlaylist) &&
-			h.HasPrefix(buf) {
-			return suggestPlaylist(buf)
-		}
-
-		if strings.HasPrefix(h.Name, buf) {
-			c = append(c, h.Name)
+		if hasSpace {
+			candidates := h.Complete(buf)
+			if candidates != nil {
+				return candidates
+			}
 			continue
 		}
-
+		// complete the command itself
+		if hasPrefixFold(h.Name, buf) {
+			c = append(c, h.Name)
+		}
 		for _, a := range h.Aliases {
-			if strings.HasPrefix(a, buf) {
+			if hasPrefixFold(a, buf) {
 				c = append(c, a)
-				break
 			}
 		}
 	}
@@ -57,8 +55,20 @@ func completeNothing(string) []string {
 func suggestPlaylist(buf string) []string {
 	updateCache()
 	pls := make([]string, 0, len(*cache))
-	buf = strings.ToLower(buf)
 	command, name := splitCmd(buf)
+	if command == "" {
+		return nil
+	}
+	// do nothing if the command is not a playlist command
+	h := handlers.Match(command)
+	if h == nil ||
+		!(h.Cmd == cmd.PlayUserPlaylist ||
+			h.Cmd == cmd.SavePlaying ||
+			h.Cmd == cmd.RemovePlaying ||
+			h.Cmd == cmd.EditPlaylist ||
+			h.Cmd == cmd.DeletePlaylist) {
+		return nil
+	}
 
 	if name == "" {
 		// return all playlist names
@@ -70,7 +80,7 @@ func suggestPlaylist(buf string) []string {
 	}
 
 	for _, p := range *cache {
-		if strings.HasPrefix(strings.ToLower(p.Name), name) {
+		if hasPrefixFold(p.Name, name) {
 			pls = append(pls,
 				fmt.Sprintf("%s %s", command, p.Name))
 		}
@@ -78,12 +88,24 @@ func suggestPlaylist(buf string) []string {
 	return pls
 }
 
-func newCompleter(cand []string) func(string) []string {
+func newWordCompleter(cand []string, commands ...string) func(string) []string {
 	return func(buf string) []string {
+		command, arg := splitCmd(buf)
+		isMatch := false
+		for _, c := range commands {
+			if strings.EqualFold(command, c) {
+				isMatch = true
+				break
+			}
+		}
+		if !isMatch {
+			return nil
+		}
 		items := make([]string, 0, len(cand))
 		for _, s := range cand {
-			if hasPrefixFold(s, buf) {
-				items = append(items, s)
+			if hasPrefixFold(s, arg) {
+				items = append(items,
+					fmt.Sprintf("%s %s", command, s))
 			}
 		}
 		// we want to return nil in case of no match

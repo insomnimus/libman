@@ -8,6 +8,7 @@ func TestHasPrefixFold(t *testing.T) {
 	tests := []struct {
 		x, y string
 	}{
+		{"asdf", ""},
 		{"asdf", "AsDf"},
 		{"LMAO 123", "lmA"},
 		{"ĞĞĞAfs", "ğğ"},

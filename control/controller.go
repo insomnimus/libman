@@ -17,15 +17,14 @@ var (
 	user   *spotify.PrivateUser
 	device *spotify.PlayerDevice
 
-	prompt           = "@libman>"
-	PlaylistPageSize = 25
-	userAliases      = new(alias.Set)
-	handlers         handler.Set
-	cache            *PlaylistCache
-	lastPl           *Playlist
-	isPlaying        bool
-	shuffleState     bool
-	repeatState      = "off"
+	prompt       = "@libman>"
+	userAliases  = new(alias.Set)
+	handlers     handler.Set
+	cache        *PlaylistCache
+	lastPl       *Playlist
+	isPlaying    bool
+	shuffleState bool
+	repeatState  = "off"
 
 	reVol = regexp.MustCompile(`^\s*(\-|\+)\s*([0-9]+)\s*$`)
 

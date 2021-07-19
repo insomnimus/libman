@@ -7,7 +7,6 @@ import (
 	"github.com/insomnimus/libman/control"
 	"log"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"strings"
 	// "github.com/vrischmann/userdir"
@@ -48,9 +47,6 @@ func main() {
 		}
 	}
 
-	// The liner package traps sigint
-	// but not while it's being blocked, so trap it here as well.
-	signal.Notify(make(chan os.Signal), os.Interrupt)
 	go control.Start(creds.Client, creds.User, c.Prompt, commands)
 	<-control.Terminator
 	// save the token if there's a cache file specified

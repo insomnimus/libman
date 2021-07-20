@@ -195,7 +195,7 @@ func getPlaying() (*spotify.FullTrack, error) {
 func handleVolume(arg string) error {
 	if arg == "" {
 		if device == nil {
-			return fmt.Errorf("No active device detected")
+			return fmt.Errorf("no active device detected")
 		}
 		fmt.Printf("The volume is %d%%.\n", device.Volume)
 		return nil

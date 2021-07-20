@@ -102,9 +102,7 @@ func (s Set) CommandsAndAliases() []string {
 	items := make([]string, 0, len(s))
 	for _, h := range s {
 		items = append(items, h.Name)
-		for _, a := range h.Aliases {
-			items = append(items, a)
-		}
+		items = append(items, h.Aliases...)
 	}
 	return items
 }

@@ -296,9 +296,7 @@ func _applySuggestHelp(set handler.Set) {
 	topics := make([]string, 0, len(set))
 	for _, h := range set {
 		topics = append(topics, h.Name)
-		for _, a := range h.Aliases {
-			topics = append(topics, a)
-		}
+		topics = append(topics, h.Aliases...)
 	}
 	sort.Strings(topics)
 	set.Find(cmd.Help).Complete = newWordCompleter(topics, "help")

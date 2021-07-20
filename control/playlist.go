@@ -108,15 +108,6 @@ func (p *Playlist) editDetails() error {
 	return nil
 }
 
-func (p *Playlist) play() error {
-	err := playPlaylist(p)
-	if err != nil {
-		return err
-	}
-	lastPl = p
-	return nil
-}
-
 func handleSavePlaying(arg string) error {
 	pl := choosePlaylist(arg)
 	if pl == nil {

@@ -26,14 +26,6 @@ func (c *PlaylistCache) insertFull(index int, p spotify.FullPlaylist) {
 	*c = append(left, right...)
 }
 
-func (c *PlaylistCache) insertSimple(index int, p spotify.SimplePlaylist) {
-	left := append((*c)[:index], Playlist{
-		spotify.FullPlaylist{SimplePlaylist: p}, false,
-	})
-	right := (*c)[index:]
-	*c = append(left, right...)
-}
-
 func (c *PlaylistCache) remove(id spotify.ID) {
 	index := -1
 	for i, p := range *c {
@@ -59,19 +51,6 @@ func (c *PlaylistCache) remove(id spotify.ID) {
 
 func (c *PlaylistCache) pushSimple(p spotify.SimplePlaylist) {
 	*c = append(*c, plFromSimple(p))
-}
-
-func (c *PlaylistCache) pushFull(p spotify.FullPlaylist) {
-	*c = append(*c, Playlist{p, true})
-}
-
-func (c *PlaylistCache) find(id spotify.ID) *Playlist {
-	for i := range *c {
-		if (*c)[i].ID == id {
-			return &(*c)[i]
-		}
-	}
-	return nil
 }
 
 func (c *PlaylistCache) findByName(s string) *Playlist {

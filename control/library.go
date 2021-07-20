@@ -94,12 +94,20 @@ func choosePlaylist(arg string) *Playlist {
 	return cache.get(n)
 }
 
-func handleEditPlaylist(arg string) error {
+func handleChangePlaylistDetails(arg string) error {
 	pl := choosePlaylist(arg)
 	if pl == nil {
 		return nil
 	}
 	return pl.editDetails()
+}
+
+func handleEditPlaylist(arg string) error {
+	pl := choosePlaylist(arg)
+	if pl == nil {
+		return nil
+	}
+	return pl.editTracks()
 }
 
 func updateCache() error {

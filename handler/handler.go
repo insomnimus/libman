@@ -97,3 +97,14 @@ func (h *Handler) HasPrefix(s string) bool {
 
 	return false
 }
+
+func (s Set) CommandsAndAliases() []string {
+	items := make([]string, 0, len(s))
+	for _, h := range s {
+		items = append(items, h.Name)
+		for _, a := range h.Aliases {
+			items = append(items, a)
+		}
+	}
+	return items
+}

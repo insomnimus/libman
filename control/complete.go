@@ -8,11 +8,16 @@ import (
 )
 
 func completeCommand(buf string) (c []string) {
+	buf = strings.TrimPrefix(buf, " ")
 	// first check aliases
 	for _, a := range userAliases.Inner() {
 		if hasPrefixFold(a.Left, buf) {
 			c = append(c, a.Left)
 		}
+	}
+	// do not include handler aliases if buf has no text
+	if buf == "" {
+		return append(c, handlers.Names()...)
 	}
 	hasSpace := strings.Contains(buf, " ")
 	// check handlers

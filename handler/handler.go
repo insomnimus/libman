@@ -106,3 +106,10 @@ func (s Set) CommandsAndAliases() []string {
 	}
 	return items
 }
+
+func (s Set) Names() (names []string) {
+	for _, h := range s {
+		names = append(names, h.Name)
+	}
+	return
+}

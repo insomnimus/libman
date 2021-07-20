@@ -98,6 +98,7 @@ func suggestPlaylist(buf string) []string {
 // will return nil if the command is not a match of given command names (commands parameter)
 func newWordCompleter(cand []string, commands ...string) func(string) []string {
 	return func(buf string) []string {
+		buf = strings.TrimPrefix(buf, " ") // ignore leading space
 		command, arg := splitCmd(buf)
 		isMatch := false
 		for _, c := range commands {

@@ -112,6 +112,8 @@ func (p *PlaylistBuf) nextPage() {
 	if p.upTo > len(p.pl.Tracks.Tracks) {
 		p.upTo = len(p.pl.Tracks.Tracks)
 	}
+	
+	p.displayPage()
 }
 
 func (p *PlaylistBuf) displayPage() {
@@ -481,7 +483,7 @@ func (p *PlaylistBuf) handlePlay(arg string) {
 		PlaybackContext: &p.pl.URI,
 		PlaybackOffset: &spotify.PlaybackOffset{
 			Position: n,
-			URI:      p.pl.Tracks.Tracks[n].Track.URI,
+			//URI:      p.pl.Tracks.Tracks[n].Track.URI,
 		},
 	})
 

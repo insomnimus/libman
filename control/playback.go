@@ -278,12 +278,6 @@ func handleShow(arg string) error {
 	return nil
 }
 
-// only for windows, during exits the playback is toggled
-// so to toggle it back, export the func
-func TogglePlay() error {
-	return togglePlay()
-}
-
 func handleSharePlaying(arg string) error {
 	if err := updateDevice(); err != nil {
 		return err
@@ -296,13 +290,12 @@ func handleSharePlaying(arg string) error {
 
 	if t == nil {
 		fmt.Println("Not playing a track.")
-	} else {
-		err = clipboard.WriteAll(t.ExternalURLs["spotify"])
-		if err != nil {
-			return err
-		}
-		fmt.Printf("Copied the URL of %s [%s] by %s to the clipboard.\n", t.Name, t.Album.Name, joinArtists(t.Artists))
-		// fmt.Printf("shuffle = %t\nrepeat = %s\n", shuffleState, repeatState)
+		return nil
 	}
+	err = clipboard.WriteAll(t.ExternalURLs["spotify"])
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Copied the URL for %s [%s] by %s to the clipboard.\n", t.Name, t.Album.Name, joinArtists(t.Artists))
 	return nil
 }

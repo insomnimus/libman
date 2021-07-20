@@ -49,6 +49,9 @@ func handleSAlbum(arg string) error {
 		return nil
 	}
 
+	for i, a := range albs {
+		fmt.Printf("#%2d | %s by %s\n", i, a.Name, joinArtists(a.Artists))
+	}
 	n := readNumber(0, len(albs))
 	if n < 0 {
 		fmt.Println("cancelled")
@@ -71,6 +74,9 @@ func handleSArtist(arg string) error {
 	if len(arts) == 0 {
 		fmt.Printf("No result for %s.\n", arg)
 		return nil
+	}
+	for i, a := range arts {
+		fmt.Printf("#%2d | %s\n", i, a.Name)
 	}
 
 	n := readNumber(0, len(arts))
@@ -96,7 +102,9 @@ func handleSPlaylist(arg string) error {
 		fmt.Printf("No result for %s.\n", arg)
 		return nil
 	}
-
+	for i, p := range pls {
+		fmt.Printf("#%2d | %s from %s\n", i, p.Name, p.Owner.DisplayName)
+	}
 	n := readNumber(0, len(pls))
 	if n < 0 {
 		fmt.Println("cancelled")

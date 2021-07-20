@@ -135,6 +135,7 @@ func (p *PlaylistBuf) interactive() (bool, error) {
 	fmt.Printf("Displaying page 1 of %d.\n", p.nPages())
 	var input, cmd, arg string
 	var cancelled bool
+	p.displayPage()
 	for {
 		rl.SetCompleter(p.completeCommand)
 		input, cancelled = readPrompt(true, "%s$ ", p.pl.Name)

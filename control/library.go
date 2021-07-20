@@ -94,7 +94,7 @@ func choosePlaylist(arg string) *Playlist {
 	return cache.get(n)
 }
 
-func handleChangePlaylistDetails(arg string) error {
+func handleEditPlaylistDetails(arg string) error {
 	pl := choosePlaylist(arg)
 	if pl == nil {
 		return nil

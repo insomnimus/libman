@@ -24,6 +24,15 @@ func DefaultHandlers() handler.Set {
 	set := handler.Set{
 		// library commands
 		hand(
+			cmd.EditPlaylistDetails,
+			"edit-details",
+			"Edit a playlists name or description.",
+			"edit-details [playlist]",
+			"Edit a playlists name or description.",
+			[]string{"rename"},
+			handleEditPlaylistDetails,
+		),
+		hand(
 			cmd.SavePlaying,
 			"save-playing",
 			"Save the currently playing song to a playlist.",
@@ -270,6 +279,7 @@ func DefaultHandlers() handler.Set {
 }
 
 func _applySuggestPlaylist(set handler.Set) {
+	set.Find(cmd.EditPlaylistDetails).Complete = suggestPlaylist
 	set.Find(cmd.PlayUserPlaylist).Complete = suggestPlaylist
 	set.Find(cmd.SavePlaying).Complete = suggestPlaylist
 	set.Find(cmd.RemovePlaying).Complete = suggestPlaylist

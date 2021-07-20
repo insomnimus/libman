@@ -22,6 +22,7 @@ const (
 	SavePlaying
 	RemovePlaying
 	CreatePlaylist
+	EditPlaylistDetails
 	EditPlaylist
 	DeletePlaylist
 

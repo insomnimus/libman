@@ -63,6 +63,7 @@ func suggestPlaylist(buf string) []string {
 	h := handlers.Match(command)
 	if h == nil ||
 		!(h.Cmd == cmd.PlayUserPlaylist ||
+			h.Cmd == cmd.EditPlaylistDetails ||
 			h.Cmd == cmd.SavePlaying ||
 			h.Cmd == cmd.RemovePlaying ||
 			h.Cmd == cmd.EditPlaylist ||

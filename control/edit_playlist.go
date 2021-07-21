@@ -137,7 +137,7 @@ func (p *PlaylistBuf) interactive() (bool, error) {
 	var cancelled bool
 	p.displayPage()
 	for {
-		rl.SetCompleter(p.completeCommand)
+		rl.SetCompleter(p.handlers.Complete)
 		input, cancelled = readPrompt(true, "%s$ ", p.pl.Name)
 		if cancelled {
 			if p.hasChanges() {
@@ -178,31 +178,6 @@ func (p *PlaylistBuf) interactive() (bool, error) {
 			h.Run(arg)
 		}
 	}
-}
-
-func (p *PlaylistBuf) completeCommand(buf string) (c []string) {
-	hasSpace := strings.Contains(buf, " ")
-	for _, h := range p.handlers {
-		if hasSpace {
-			candidates := h.Complete(buf)
-			if candidates != nil {
-				return candidates
-			}
-			continue
-		}
-
-		// complete the command itself
-		if hasPrefixFold(h.Name, buf) {
-			c = append(c, h.Name)
-		}
-		for _, a := range h.Aliases {
-			if hasPrefixFold(a, buf) {
-				c = append(c, a)
-			}
-		}
-	}
-
-	return
 }
 
 func NewPlaylistBuf(pl spotify.FullPlaylist) *PlaylistBuf {

@@ -33,6 +33,24 @@ func DefaultHandlers() handler.Set {
 			handleEditPlaylistDetails,
 		),
 		hand(
+			cmd.LikePlaying,
+			"like-playing",
+			"Save the currently playing track to your 'my music' folder.",
+			"save-playing",
+			"Save the currently playing track to your 'my music' folder.",
+			[]string{"like", "fav", "fave"},
+			handleLikePlaying,
+		),
+		hand(
+			cmd.DislikePlaying,
+			"dislike-playing",
+			"Remove the currently playing track from your 'my music' folder.",
+			"dislike-playing",
+			"Remove the currently playing track from your 'my music' folder.",
+			[]string{"dislike", "unfave", "unfav"},
+			handleDislikePlaying,
+		),
+		hand(
 			cmd.SavePlaying,
 			"save-playing",
 			"Save the currently playing song to a playlist.",
@@ -232,6 +250,17 @@ func DefaultHandlers() handler.Set {
 			"Play a playlist from your library.\nIf the playlist name is not given, you will be prompted to choose one from a list of your playlists.",
 			[]string{"pl"},
 			handlePlayUserPlaylist,
+		),
+		hand(
+			cmd.PlayLibrary,
+			"play-library",
+			"Play tracks from your 'my music' folder.",
+			"play-library",
+			"Play tracks from your 'my library' folder.",
+			[]string{"lib"},
+			func(string) error {
+				return playUserLibrary()
+			},
 		),
 		hand(
 			cmd.Help,

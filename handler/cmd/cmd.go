@@ -19,6 +19,8 @@ const (
 	Next
 	Prev
 
+	DislikePlaying
+	LikePlaying
 	SavePlaying
 	RemovePlaying
 	CreatePlaylist
@@ -28,6 +30,7 @@ const (
 
 	Help
 	PlayUserPlaylist
+	PlayLibrary
 	SetDevice
 	Show
 	Prompt

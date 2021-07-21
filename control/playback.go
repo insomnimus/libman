@@ -312,3 +312,21 @@ func queueAlbum(*spotify.SimpleAlbum) error {
 	fmt.Println("Not yet implemented.")
 	return nil
 }
+
+func playUserLibrary() error {
+	if err := updateLibraryCache(); err != nil {
+		return err
+	}
+	if len(libraryCache) == 0 {
+		fmt.Println("You have no saved tracks in your library.")
+		return nil
+	}
+	err := client.PlayOpt(&spotify.PlayOptions{
+		URIs: libraryCache.uris(),
+	})
+	if err == nil {
+		fmt.Println("Playing tracks from your library.")
+		isPlaying = true
+	}
+	return err
+}

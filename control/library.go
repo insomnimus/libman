@@ -139,11 +139,17 @@ func updateCache() error {
 // }
 
 func likeTrack(t *spotify.FullTrack) error {
-	// There's no function to check if the track is already in the library.
-	// So just add it lol.
+	if err := updateLibraryCache(); err != nil {
+		return err
+	}
+	if libraryCache.contains(t.ID) {
+		fmt.Printf("%s is already in your library.\n", t.Name)
+		return nil
+	}
 	err := client.AddTracksToLibrary(t.ID)
 	if err == nil {
 		fmt.Printf("Saved %s to the library.\n", t.Name)
+		libraryCache.push(*t)
 	}
 	return err
 }
@@ -181,6 +187,83 @@ func followPlaylist(p *Playlist) error {
 	err := client.FollowPlaylist(spotify.ID(p.Owner.ID), p.ID, true)
 	if err == nil {
 		fmt.Printf("Followed %s.\n", p.Name)
+	}
+	return err
+}
+
+func updateLibraryCache() error {
+	if libraryCache == nil {
+		limit := 50
+		page, err := client.CurrentUsersTracksOpt(&spotify.Options{
+			Limit: &limit,
+		})
+		if err != nil {
+			return err
+		}
+		libraryCache = make(LibraryCache, 0, len(page.Tracks))
+		if len(page.Tracks) == 0 {
+			return nil
+		}
+		if len(page.Tracks) < 50 {
+			for _, t := range page.Tracks {
+				libraryCache.push(t.FullTrack)
+			}
+			return nil
+		}
+		// There might be more than 50 tracks, page until api returns none.
+		for offset := 1; len(page.Tracks) > 0; offset++ {
+			ofs := offset * limit
+			page, err = client.CurrentUsersTracksOpt(&spotify.Options{
+				Limit:  &limit,
+				Offset: &ofs,
+			})
+			if err != nil {
+				return err
+			}
+			for _, t := range page.Tracks {
+				libraryCache.push(t.FullTrack)
+			}
+		}
+	}
+	return nil
+}
+
+func handleLikePlaying(string) error {
+	t, err := getPlaying()
+	if err != nil {
+		return err
+	}
+	if err := updateLibraryCache(); err != nil {
+		return err
+	}
+	if libraryCache.contains(t.ID) {
+		fmt.Printf("%s is already in your library.\n", t.Name)
+		return nil
+	}
+	err = client.AddTracksToLibrary(t.ID)
+	if err == nil {
+		libraryCache.push(*t)
+		fmt.Printf("Saved %s to your library.\n", t.Name)
+	}
+	return err
+}
+
+func handleDislikePlaying(string) error {
+	t, err := getPlaying()
+	if err != nil {
+		return err
+	}
+	if err := updateLibraryCache(); err != nil {
+		return err
+	}
+	if !libraryCache.contains(t.ID) {
+		fmt.Printf("%s is not in your library.\n", t.Name)
+		return nil
+	}
+	err = client.RemoveTracksFromLibrary(t.ID)
+	if err == nil {
+		libraryCache.removeByID(t.ID)
+		fmt.Printf("Removed %s from your library.\n", t.Name)
 	}
 	return err
 }

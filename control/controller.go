@@ -28,8 +28,8 @@ var (
 	sAlbumHandlers    = defaultSAlbumHandlers()
 	sPlaylistHandlers = defaultSPlaylistHandlers()
 
-	cache        PlaylistCache
-	savedAlbums  AlbumCache
+	cache PlaylistCache
+	// savedAlbums  AlbumCache
 	lastPl       *Playlist
 	isPlaying    bool
 	shuffleState bool

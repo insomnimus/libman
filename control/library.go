@@ -124,19 +124,19 @@ func updateCache() error {
 	return nil
 }
 
-func updateAlbumCache() error {
-	if savedAlbums == nil {
-		page, err := client.CurrentUsersAlbums()
-		if err != nil {
-			return err
-		}
-		savedAlbums = make(AlbumCache, len(page.Albums))
-		for i, a := range page.Albums {
-			savedAlbums[i] = a.FullAlbum.SimpleAlbum
-		}
-	}
-	return nil
-}
+// func updateAlbumCache() error {
+// if savedAlbums == nil {
+// page, err := client.CurrentUsersAlbums()
+// if err != nil {
+// return err
+// }
+// savedAlbums = make(AlbumCache, len(page.Albums))
+// for i, a := range page.Albums {
+// savedAlbums[i] = a.FullAlbum.SimpleAlbum
+// }
+// }
+// return nil
+// }
 
 func likeTrack(t *spotify.FullTrack) error {
 	// There's no function to check if the track is already in the library.

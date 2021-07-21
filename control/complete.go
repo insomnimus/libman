@@ -7,6 +7,7 @@ import (
 	"github.com/insomnimus/libman/handler/cmd"
 )
 
+// completeCommand is like handler.Set.Complete but also includes user defined aliases.
 func completeCommand(buf string) (c []string) {
 	buf = strings.TrimPrefix(buf, " ")
 	// first check aliases

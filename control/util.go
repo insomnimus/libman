@@ -160,3 +160,20 @@ func expandAlias(s string) string {
 	}
 	return s
 }
+
+func parseNumber(s string, max int, usage string) (int, bool) {
+	if s == "" {
+		fmt.Println(usage)
+		return -1, false
+	}
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		fmt.Println(usage)
+		return -1, false
+	}
+	if n < 0 || n >= max {
+		fmt.Printf("Please enter a value between 0 and %d.\n", max)
+		return -1, false
+	}
+	return n, true
+}

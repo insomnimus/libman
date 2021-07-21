@@ -8,9 +8,9 @@ import (
 
 	"github.com/insomnimus/libman/alias"
 	"github.com/insomnimus/libman/handler"
-	"github.com/zmb3/spotify"
 
 	"github.com/peterh/liner"
+	"github.com/zmb3/spotify"
 )
 
 var (
@@ -18,15 +18,20 @@ var (
 	user   *spotify.PrivateUser
 	device *spotify.PlayerDevice
 
-	PlaylistPageSize = 20
-	prompt           = "@libman>"
-	userAliases      = new(alias.Set)
-	handlers         handler.Set
-	cache            *PlaylistCache
-	lastPl           *Playlist
-	isPlaying        bool
-	shuffleState     bool
-	repeatState      = "off"
+	PlaylistPageSize  = 20
+	prompt            = "@libman>"
+	userAliases       = new(alias.Set)
+	handlers          handler.Set
+	sTrackHandlers    = defaultSTrackHandlers()
+	sArtistHandlers   = defaultSArtistHandlers()
+	sAlbumHandlers    = defaultSAlbumHandlers()
+	sPlaylistHandlers = defaultSPlaylistHandlers()
+
+	cache        *PlaylistCache
+	lastPl       *Playlist
+	isPlaying    bool
+	shuffleState bool
+	repeatState  = "off"
 
 	reVol = regexp.MustCompile(`^\s*(\-|\+)\s*([0-9]+)\s*$`)
 

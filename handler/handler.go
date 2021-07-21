@@ -113,3 +113,50 @@ func (s Set) Names() (names []string) {
 	}
 	return
 }
+
+func (s Set) Complete(buf string) []string {
+	buf = strings.TrimPrefix(buf, " ")
+	// do not include handler aliases if buf has no text
+	if buf == "" {
+		return s.Names()
+	}
+	c := make([]string, 0, len(s))
+	hasSpace := strings.Contains(buf, " ")
+	// check handlers
+	for _, h := range s {
+		if hasSpace {
+			candidates := h.Complete(buf)
+			if candidates != nil {
+				return candidates
+			}
+			continue
+		}
+		// complete the command itself
+		if util.HasPrefixFold(h.Name, buf) {
+			c = append(c, h.Name)
+		}
+		for _, a := range h.Aliases {
+			if util.HasPrefixFold(a, buf) {
+				c = append(c, a)
+			}
+		}
+	}
+
+	return c
+}
+
+func (s Set) RunHelp(arg string) error {
+	if arg == "" {
+		for _, h := range s {
+			fmt.Println(h.String())
+		}
+	} else {
+		h := s.Match(arg)
+		if h == nil {
+			fmt.Printf("%s is not a known command or alias.\nRun `help` for a list of available commands.\n", arg)
+			return nil
+		}
+		fmt.Println(h.GoString())
+	}
+	return nil
+}

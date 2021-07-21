@@ -123,3 +123,23 @@ func updateCache() error {
 	}
 	return nil
 }
+
+func likeTrack(*spotify.FullTrack) error {
+	fmt.Println("Not yet implemented.")
+	return nil
+}
+
+func followArtist(*spotify.FullArtist) error {
+	fmt.Println("Not yet implemented.")
+	return nil
+}
+
+func saveAlbum(*spotify.SimpleAlbum) error {
+	fmt.Println("Not yet implemented.")
+	return nil
+}
+
+func followPlaylist(*Playlist) error {
+	fmt.Println("Not yet implemented.")
+	return nil
+}

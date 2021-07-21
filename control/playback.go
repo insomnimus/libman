@@ -299,3 +299,13 @@ func handleSharePlaying(arg string) error {
 	fmt.Printf("Copied the URL for %s [%s] by %s to the clipboard.\n", t.Name, t.Album.Name, joinArtists(t.Artists))
 	return nil
 }
+
+func queueTrack(*spotify.FullTrack) error {
+	fmt.Println("Not yet implemented.")
+	return nil
+}
+
+func queueAlbum(*spotify.SimpleAlbum) error {
+	fmt.Println("Not yet implemented.")
+	return nil
+}

@@ -91,15 +91,15 @@ func defaultSTrackHandlers() handler.Set {
 		if err := updateCache(); err != nil {
 			return nil
 		}
-		pls := make([]string, 0, len(*cache))
+		pls := make([]string, 0, len(cache))
 		if arg == "" {
-			for _, p := range *cache {
+			for _, p := range cache {
 				pls = append(pls, buf+p.Name)
 			}
 			return pls
 		}
 
-		for _, p := range *cache {
+		for _, p := range cache {
 			if hasPrefixFold(p.Name, arg) {
 				pls = append(pls, fmt.Sprintf("%s %s", buf, p.Name))
 			}

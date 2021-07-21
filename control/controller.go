@@ -18,16 +18,18 @@ var (
 	user   *spotify.PrivateUser
 	device *spotify.PlayerDevice
 
-	PlaylistPageSize  = 20
-	prompt            = "@libman>"
-	userAliases       = new(alias.Set)
+	PlaylistPageSize = 20
+	prompt           = "@libman>"
+	userAliases      = new(alias.Set)
+
 	handlers          handler.Set
 	sTrackHandlers    = defaultSTrackHandlers()
 	sArtistHandlers   = defaultSArtistHandlers()
 	sAlbumHandlers    = defaultSAlbumHandlers()
 	sPlaylistHandlers = defaultSPlaylistHandlers()
 
-	cache        *PlaylistCache
+	cache        PlaylistCache
+	savedAlbums  AlbumCache
 	lastPl       *Playlist
 	isPlaying    bool
 	shuffleState bool

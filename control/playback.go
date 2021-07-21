@@ -300,9 +300,12 @@ func handleSharePlaying(arg string) error {
 	return nil
 }
 
-func queueTrack(*spotify.FullTrack) error {
-	fmt.Println("Not yet implemented.")
-	return nil
+func queueTrack(t *spotify.FullTrack) error {
+	err := client.QueueSong(t.ID)
+	if err == nil {
+		fmt.Printf("Added %s by %s to the queueu.\n", t.Name, joinArtists(t.Artists))
+	}
+	return err
 }
 
 func queueAlbum(*spotify.SimpleAlbum) error {

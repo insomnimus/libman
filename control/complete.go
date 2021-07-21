@@ -60,7 +60,7 @@ func completeNothing(string) []string {
 
 func suggestPlaylist(buf string) []string {
 	updateCache()
-	pls := make([]string, 0, len(*cache))
+	pls := make([]string, 0, len(cache))
 	command, name := splitCmd(buf)
 	if command == "" {
 		return nil
@@ -79,14 +79,14 @@ func suggestPlaylist(buf string) []string {
 
 	if name == "" {
 		// return all playlist names
-		for _, p := range *cache {
+		for _, p := range cache {
 			pls = append(pls,
 				fmt.Sprintf("%s %s", command, p.Name))
 		}
 		return pls
 	}
 
-	for _, p := range *cache {
+	for _, p := range cache {
 		if hasPrefixFold(p.Name, name) {
 			pls = append(pls,
 				fmt.Sprintf("%s %s", command, p.Name))

@@ -63,5 +63,5 @@ func (c *PlaylistCache) findByName(s string) *Playlist {
 }
 
 func (c *PlaylistCache) get(n int) *Playlist {
-	return &(*cache)[n]
+	return &(cache)[n]
 }

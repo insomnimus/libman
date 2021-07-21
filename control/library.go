@@ -69,7 +69,7 @@ func choosePlaylist(arg string) *Playlist {
 		return nil
 	}
 
-	if len(*cache) == 0 {
+	if len(cache) == 0 {
 		fmt.Println("you don't seem to have any playlists")
 		return nil
 	}
@@ -82,11 +82,11 @@ func choosePlaylist(arg string) *Playlist {
 		return pl
 	}
 
-	for i, p := range *cache {
+	for i, p := range cache {
 		fmt.Printf("%-2d | %s\n", i, p.Name)
 	}
 
-	n := readNumber(0, len(*cache))
+	n := readNumber(0, len(cache))
 	if n == -1 {
 		fmt.Println("cancelled")
 		return nil
@@ -116,7 +116,7 @@ func updateCache() error {
 		if err != nil {
 			return err
 		}
-		cache = new(PlaylistCache)
+		cache = make(PlaylistCache, 0, len(page.Playlists))
 		for _, p := range page.Playlists {
 			cache.pushSimple(p)
 		}
@@ -124,22 +124,63 @@ func updateCache() error {
 	return nil
 }
 
-func likeTrack(*spotify.FullTrack) error {
+func updateAlbumCache() error {
+	if savedAlbums == nil {
+		page, err := client.CurrentUsersAlbums()
+		if err != nil {
+			return err
+		}
+		savedAlbums = make(AlbumCache, len(page.Albums))
+		for i, a := range page.Albums {
+			savedAlbums[i] = a.FullAlbum.SimpleAlbum
+		}
+	}
+	return nil
+}
+
+func likeTrack(t *spotify.FullTrack) error {
+	// There's no function to check if the track is already in the library.
+	// So just add it lol.
+	err := client.AddTracksToLibrary(t.ID)
+	if err == nil {
+		fmt.Printf("Saved %s to the library.\n", t.Name)
+	}
+	return err
+}
+
+func followArtist(a *spotify.FullArtist) error {
+	follows, err := client.CurrentUserFollows("artist", a.ID)
+	if err != nil {
+		return err
+	}
+	if len(follows) > 0 && follows[0] {
+		fmt.Printf("You are already following %s.\n", a.Name)
+		return nil
+	}
+	err = client.FollowArtist(a.ID)
+	if err == nil {
+		fmt.Printf("Followed %s.\n", a.Name)
+	}
+	return err
+}
+
+func saveAlbum(spotify.SimpleAlbum) error {
+	/******** There's currently no function to do this in zmb3/spotify
+	if err := updateAlbumCache(); err != nil{
+		return err
+	}
+	if savedAlbums.contains(a.ID) {
+		fmt.Printf("%s is already in your library.\n", a.Name)
+	}
+	********/
 	fmt.Println("Not yet implemented.")
 	return nil
 }
 
-func followArtist(*spotify.FullArtist) error {
-	fmt.Println("Not yet implemented.")
-	return nil
-}
-
-func saveAlbum(*spotify.SimpleAlbum) error {
-	fmt.Println("Not yet implemented.")
-	return nil
-}
-
-func followPlaylist(*Playlist) error {
-	fmt.Println("Not yet implemented.")
-	return nil
+func followPlaylist(p *Playlist) error {
+	err := client.FollowPlaylist(spotify.ID(p.Owner.ID), p.ID, true)
+	if err == nil {
+		fmt.Printf("Followed %s.\n", p.Name)
+	}
+	return err
 }

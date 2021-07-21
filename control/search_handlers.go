@@ -271,7 +271,7 @@ func sAlbumPage(albums []spotify.SimpleAlbum) error {
 		case scmd.Play:
 			return playAlbum(&albums[n])
 		case scmd.Save:
-			return saveAlbum(&albums[n])
+			return saveAlbum(albums[n])
 		case scmd.Queue:
 			return queueAlbum(&albums[n])
 		default:

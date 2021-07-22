@@ -43,7 +43,7 @@ func readPrompt(addToHistory bool, format string, args ...interface{}) (reply st
 	if err != nil {
 		return "", true
 	}
-	if addToHistory {
+	if addToHistory && reply != "" {
 		rl.AppendHistory(reply)
 	}
 	return strings.TrimSpace(reply), false

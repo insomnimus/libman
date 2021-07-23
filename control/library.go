@@ -56,7 +56,11 @@ func handleDeletePlaylist(arg string) error {
 		return err
 	}
 
-	fmt.Printf("deleted %s\n", pl.Name)
+	msg = "Deleted %s.\n"
+	if pl.isFollowed {
+		msg = "Unfollowed %s.\n"
+	}
+	fmt.Printf(msg, pl.Name)
 	cache.remove(pl.ID)
 	if lastPl != nil && pl.ID == lastPl.ID {
 		lastPl = nil

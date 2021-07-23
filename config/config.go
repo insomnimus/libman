@@ -17,7 +17,8 @@ type Config struct {
 	RCFile      string `toml:"libmanrc_path" comment:"The location of the startup script file. $LIBMAN_RC_PATH overrides this field if set."`
 	HistFile    string `toml:"history_file" comment:"File where artist, album and track history will be saved to. $LIBMAN_HIST_FILE overrides this, if set."`
 
-	Prompt string `toml:"prompt" comment:"The libman shell prompt." commented:"true" default:"@libman>"`
+	HistSize int    `toml:"history_size" comment:"History size, applies to artist/album/track history independently." default:"66"`
+	Prompt   string `toml:"prompt" comment:"The libman shell prompt." commented:"true" default:"@libman>"`
 }
 
 func DefaultConfig() Config {
@@ -28,6 +29,7 @@ func DefaultConfig() Config {
 		CacheFile:   os.Getenv("LIBMAN_CACHE_PATH"),
 		RCFile:      RCPath(),
 		Prompt:      "@libman>",
+		HistSize:    66,
 	}
 }
 

@@ -48,6 +48,15 @@ func handleHelp(c *cli.Context) error {
 
 	for _, f := range c.App.VisibleFlags() {
 		switch f := f.(type) {
+		case *cli.IntFlag:
+			fmt.Printf("  %s: %s",
+				joinFlags(f.Name, f.Aliases),
+				f.Usage)
+
+			if len(f.EnvVars) > 0 {
+				fmt.Printf("    [$%s]", f.EnvVars[0])
+			}
+			fmt.Println()
 		case *cli.StringFlag:
 			fmt.Printf("  %s: %s",
 				joinFlags(f.Name, f.Aliases),
@@ -103,6 +112,7 @@ func configFromArgs() (*config.Config, error) {
 		hist       string
 		redirect   string
 		prompt     string
+		histSize   *int
 	)
 
 	app := &cli.App{
@@ -189,6 +199,11 @@ func configFromArgs() (*config.Config, error) {
 				Aliases: []string{"V"},
 				Usage:   "Show the installed version and exit.",
 			},
+			&cli.IntFlag{
+				Name:        "hist-size",
+				Usage:       "History size, recommended to keep under 100.",
+				Destination: histSize,
+			},
 		},
 	}
 
@@ -203,6 +218,7 @@ func configFromArgs() (*config.Config, error) {
 		redirect != "" &&
 		rc != "" &&
 		hist != "" &&
+		histSize != nil &&
 		prompt != "" {
 		return &config.Config{
 			ID:          id,
@@ -211,6 +227,7 @@ func configFromArgs() (*config.Config, error) {
 			CacheFile:   cache,
 			RCFile:      rc,
 			HistFile:    hist,
+			HistSize:    *histSize,
 			Prompt:      prompt,
 		}, nil
 	}

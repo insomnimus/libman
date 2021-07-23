@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// laod hist file, if any
+	// load hist file, if any
 	if c.HistFile != "" {
 		h, err := history.Load(c.HistFile)
 		if err != nil {
@@ -33,6 +33,9 @@ func main() {
 		} else {
 			*control.Hist = *h
 		}
+	}
+	if c.HistSize > 0 {
+		history.HistorySize = uint32(c.HistSize)
 	}
 	defer func() {
 		if c.HistFile != "" && control.Hist.Modified() {

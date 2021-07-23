@@ -225,6 +225,15 @@ func DefaultHandlers() handler.Set {
 
 		// misc commands
 		hand(
+			cmd.RelatedArtists,
+			"related-artists",
+			"Get a list of related artists for an artist.",
+			"related-artists <artist>",
+			"Get related artists for a given artist.",
+			[]string{"related", "rel"},
+			handleRelatedArtists,
+		),
+		hand(
 			cmd.SetDevice,
 			"device",
 			"Change the playback device.",
@@ -337,6 +346,7 @@ func _applySuggestHelp(set handler.Set) {
 func _applySuggestArtist(set handler.Set) {
 	set.Find(cmd.PlayFirstArtist).Complete = dynamicCompleteFunc(&Hist.Artists, "play-artist", "part")
 	set.Find(cmd.SearchArtist).Complete = dynamicCompleteFunc(&Hist.Artists, "search-artist", "sart")
+	set.Find(cmd.RelatedArtists).Complete = dynamicCompleteFunc(&Hist.Artists, "related-artists", "related", "rel")
 }
 
 func _applySuggestAlbum(set handler.Set) {

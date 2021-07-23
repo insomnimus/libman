@@ -341,3 +341,43 @@ func sPlaylistPage(pls []Playlist) error {
 		}
 	}
 }
+
+func handleRelatedArtists(arg string) error {
+	if arg == "" {
+		handlers.ShowUsage(cmd.RelatedArtists)
+		return nil
+	}
+	arts, err := searchArtist(arg)
+	if err != nil {
+		return err
+	}
+	if len(arts) == 0 {
+		fmt.Printf("No result for %s.\n", arg)
+		return nil
+	}
+	Hist.AppendArtist(arg)
+
+	for i, a := range arts {
+		fmt.Printf("%2d | %s\n", i, a.Name)
+	}
+	n := readNumber(0, len(arts))
+	if n < 0 {
+		fmt.Println("cancelled")
+		return nil
+	}
+
+	related, err := client.GetRelatedArtists(arts[n].ID)
+	if err != nil {
+		return err
+	}
+	if len(related) == 0 {
+		fmt.Println("No related artists.")
+		return nil
+	}
+
+	for i, a := range related {
+		fmt.Printf("%2d | %s\n", i, a.Name)
+	}
+
+	return sArtistPage(related)
+}

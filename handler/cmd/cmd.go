@@ -36,4 +36,5 @@ const (
 	Prompt
 	Alias
 	Share
+	RelatedArtists
 )

@@ -16,7 +16,7 @@ func (p *Playlist) makeFull() error {
 		return err
 	}
 
-	*p = Playlist{*pl, true}
+	*p = Playlist{*pl, true, false}
 	return nil
 }
 

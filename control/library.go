@@ -42,8 +42,11 @@ func handleDeletePlaylist(arg string) error {
 	if pl == nil {
 		return nil
 	}
-
-	if !readBool("are you sure you want to delete %s?", pl.Name) {
+	msg := "Are you sure you want to delete %s?"
+	if pl.isFollowed {
+		msg = "Are you sure you want to unfollow %s?"
+	}
+	if !readBool(msg, pl.Name) {
 		fmt.Println("cancelled")
 		return nil
 	}
@@ -112,13 +115,18 @@ func handleEditPlaylist(arg string) error {
 
 func updateCache() error {
 	if cache == nil {
-		page, err := client.CurrentUsersPlaylists()
+		// page, err := client.CurrentUsersPlaylists()
+		page, err := client.GetPlaylistsForUser(user.ID)
 		if err != nil {
 			return err
 		}
 		cache = make(PlaylistCache, 0, len(page.Playlists))
 		for _, p := range page.Playlists {
-			cache.pushSimple(p)
+			if p.Owner.ID != string(user.ID) {
+				cache.pushFollowed(p)
+			} else {
+				cache.pushSimple(p)
+			}
 		}
 	}
 	return nil

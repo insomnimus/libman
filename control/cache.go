@@ -8,12 +8,14 @@ import (
 
 type Playlist struct {
 	spotify.FullPlaylist
-	isFull bool
+	isFull     bool
+	isFollowed bool
 }
 
 func plFromSimple(p spotify.SimplePlaylist) Playlist {
 	return Playlist{
 		spotify.FullPlaylist{SimplePlaylist: p},
+		false,
 		false,
 	}
 }
@@ -21,9 +23,13 @@ func plFromSimple(p spotify.SimplePlaylist) Playlist {
 type PlaylistCache []Playlist
 
 func (c *PlaylistCache) insertFull(index int, p spotify.FullPlaylist) {
-	left := append((*c)[:index], Playlist{p, true})
+	left := append((*c)[:index], Playlist{p, true, false})
 	right := (*c)[index:]
 	*c = append(left, right...)
+}
+
+func (c *PlaylistCache) push(p Playlist) {
+	*c = append(PlaylistCache{p}, (*c)...)
 }
 
 func (c *PlaylistCache) remove(id spotify.ID) {
@@ -64,4 +70,12 @@ func (c *PlaylistCache) findByName(s string) *Playlist {
 
 func (c *PlaylistCache) get(n int) *Playlist {
 	return &(cache)[n]
+}
+
+func (c *PlaylistCache) pushFollowed(p spotify.SimplePlaylist) {
+	pl := Playlist{
+		FullPlaylist: spotify.FullPlaylist{SimplePlaylist: p},
+		isFollowed:   true,
+	}
+	c.push(pl)
 }

@@ -80,6 +80,13 @@ func suggestPlaylist(buf string) []string {
 	if name == "" {
 		// return all playlist names
 		for _, p := range cache {
+			// do not suggest followed playlists for the edit, save or rm commands
+			if p.isFollowed && (h.Cmd == cmd.EditPlaylist ||
+				h.Cmd == cmd.EditPlaylistDetails ||
+				h.Cmd == cmd.SavePlaying ||
+				h.Cmd == cmd.RemovePlaying) {
+				continue
+			}
 			pls = append(pls,
 				fmt.Sprintf("%s %s", command, p.Name))
 		}
@@ -87,6 +94,13 @@ func suggestPlaylist(buf string) []string {
 	}
 
 	for _, p := range cache {
+		// do not suggest followed playlists for the edit, save or rm commands
+		if p.isFollowed && (h.Cmd == cmd.EditPlaylist ||
+			h.Cmd == cmd.EditPlaylistDetails ||
+			h.Cmd == cmd.SavePlaying ||
+			h.Cmd == cmd.RemovePlaying) {
+			continue
+		}
 		if hasPrefixFold(p.Name, name) {
 			pls = append(pls,
 				fmt.Sprintf("%s %s", command, p.Name))

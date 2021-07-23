@@ -24,6 +24,10 @@ type PlaylistBuf struct {
 }
 
 func (p *Playlist) editTracks() error {
+	if p.isFollowed {
+		fmt.Println("You cannot edit this playlist.")
+		return nil
+	}
 	if err := p.makeFull(); err != nil {
 		return err
 	}
@@ -40,7 +44,7 @@ func (p *Playlist) editTracks() error {
 		if err != nil {
 			return fmt.Errorf("error updating the local cache: %w", err)
 		}
-		*p = Playlist{*pl, true}
+		*p = Playlist{*pl, true, false}
 	}
 	return nil
 }

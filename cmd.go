@@ -186,7 +186,6 @@ func configFromArgs() (*config.Config, error) {
 			&cli.StringFlag{
 				Name:        "prompt",
 				Usage:       "The libman shell prompt, can be set in-app.",
-				Value:       "@libman>",
 				Destination: &prompt,
 			},
 			&cli.BoolFlag{

@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 )
 
-var HistorySize uint32 = 100
+var HistorySize uint32 = 66
 
 type History struct {
 	Artists  []string `json:"artists"`
@@ -25,6 +26,11 @@ func NewHistory() *History {
 }
 
 func (h *History) AppendArtist(s string) {
+	for _, a := range h.Artists {
+		if strings.EqualFold(a, s) {
+			return
+		}
+	}
 	h.modified = true
 	h.Artists = append(h.Artists, s)
 	if len(h.Artists) > int(HistorySize) {
@@ -33,6 +39,11 @@ func (h *History) AppendArtist(s string) {
 }
 
 func (h *History) AppendAlbum(s string) {
+	for _, a := range h.Albums {
+		if strings.EqualFold(s, a) {
+			return
+		}
+	}
 	h.modified = true
 	h.Albums = append(h.Albums, s)
 	if len(h.Albums) > int(HistorySize) {
@@ -41,6 +52,11 @@ func (h *History) AppendAlbum(s string) {
 }
 
 func (h *History) AppendTrack(s string) {
+	for _, t := range h.Tracks {
+		if strings.EqualFold(t, s) {
+			return
+		}
+	}
 	h.modified = true
 	h.Tracks = append(h.Tracks, s)
 	if len(h.Tracks) > int(HistorySize) {

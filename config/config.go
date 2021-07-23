@@ -25,7 +25,7 @@ func DefaultConfig() Config {
 		Secret:      os.Getenv("LIBMAN_SECRET"),
 		RedirectURI: os.Getenv("LIBMAN_REDIRECT_URI"),
 		CacheFile:   os.Getenv("LIBMAN_CACHE_PATH"),
-		RCFile:      rcPath(),
+		RCFile:      RCPath(),
 		Prompt:      "@libman>",
 	}
 }
@@ -75,7 +75,7 @@ func Load(path string) (*Config, error) {
 	return &c, nil
 }
 
-func rcPath() string {
+func RCPath() string {
 	if s := os.Getenv("LIBMAN_RC_PATH"); s != "" {
 		return s
 	}

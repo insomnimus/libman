@@ -7,17 +7,16 @@ import (
 	"strings"
 
 	"github.com/insomnimus/libman/auth"
-	"github.com/insomnimus/libman/config"
 	"github.com/insomnimus/libman/control"
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.12.0"
+const VERSION = "0.12.1"
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("")
-	c, err := config.FromArgs(VERSION)
+	c, err := configFromArgs()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -6,20 +6,43 @@ import (
 	"os"
 	"strings"
 
+	"github.com/insomnimus/libman/history"
+
 	"github.com/insomnimus/libman/auth"
 	"github.com/insomnimus/libman/control"
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.12.1"
+const VERSION = "0.13.0"
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("")
+
+	// read config
 	c, err := configFromArgs()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// laod hist file, if any
+	if c.HistFile != "" {
+		h, err := history.Load(c.HistFile)
+		if err != nil {
+			log.Printf("Warning: could not load the history file: %s.\n", err)
+		} else {
+			*control.Hist = *h
+		}
+	}
+	defer func() {
+		if c.HistFile != "" && control.Hist.Modified() {
+			err := control.Hist.Save(c.HistFile)
+			if err != nil {
+				log.Printf("Warning: could not save the history file: %s.\n", err)
+			}
+		}
+	}()
+
 	creds, err := auth.Login(c)
 	if err != nil {
 		log.Fatal(err)

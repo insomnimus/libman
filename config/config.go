@@ -15,6 +15,7 @@ type Config struct {
 	RedirectURI string `toml:"redirect_uri" comment:"The $LIBMAN_REDIRECT_URI will override this field if set."`
 	CacheFile   string `toml:"cache_file_path" comment:"Full file path of the libman token cache file.\nThe $LIBMAN_CACHE_PATH will override this, if set."`
 	RCFile      string `toml:"libmanrc_path" comment:"The location of the startup script file. $LIBMAN_RC_PATH overrides this field if set."`
+	HistFile    string `toml:"history_file" comment:"File where artist, album and track history will be saved to. $LIBMAN_HIST_FILE overrides this, if set."`
 
 	Prompt string `toml:"prompt" comment:"The libman shell prompt." commented:"true" default:"@libman>"`
 }

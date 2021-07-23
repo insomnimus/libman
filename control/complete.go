@@ -125,3 +125,32 @@ func newWordCompleter(cand []string, commands ...string) func(string) []string {
 		return items
 	}
 }
+
+func dynamicCompleteFunc(vec *[]string, commands ...string) func(string) []string {
+	return func(buf string) []string {
+		buf = strings.TrimPrefix(buf, " ")
+		command, arg := splitCmd(buf)
+		isMatch := false
+		for _, cmd := range commands {
+			if strings.EqualFold(cmd, command) {
+				isMatch = true
+				break
+			}
+		}
+		if !isMatch {
+			return nil
+		}
+		items := make([]string, 0, len(*vec))
+		for _, s := range *vec {
+			if hasPrefixFold(s, arg) {
+				items = append(items,
+					fmt.Sprintf("%s %s", command, s))
+			}
+		}
+
+		if len(items) == 0 {
+			return nil
+		}
+		return items
+	}
+}

@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/insomnimus/libman/history"
+
 	"github.com/insomnimus/libman/alias"
 	"github.com/insomnimus/libman/handler"
 
@@ -30,7 +32,7 @@ var (
 
 	cache        PlaylistCache
 	libraryCache LibraryCache
-	// savedAlbums  AlbumCache
+
 	lastPl       *Playlist
 	isPlaying    bool
 	shuffleState bool
@@ -40,6 +42,8 @@ var (
 
 	rl         *liner.State
 	Terminator = make(chan bool, 1)
+
+	Hist = history.NewHistory() // don't want it nil
 )
 
 func init() {
@@ -54,7 +58,7 @@ func Start(
 ) {
 	rl = liner.NewLiner()
 	rl.SetCtrlCAborts(true)
-	defer rl.Close()
+	// defer rl.Close() // can never be executed
 	client = c
 	user = u
 	if prompt != "" {

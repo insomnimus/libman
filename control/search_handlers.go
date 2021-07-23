@@ -23,6 +23,8 @@ func handleSTrack(arg string) error {
 		return nil
 	}
 
+	Hist.AppendTrack(arg)
+
 	// print the results
 	for i, t := range tracks {
 		fmt.Printf("%-2d | %s by %s\n", i, t.Name, joinArtists(t.Artists))
@@ -46,6 +48,8 @@ func handleSAlbum(arg string) error {
 		return nil
 	}
 
+	Hist.AppendAlbum(arg)
+
 	for i, a := range albs {
 		fmt.Printf("#%2d | %s by %s\n", i, a.Name, joinArtists(a.Artists))
 	}
@@ -67,6 +71,9 @@ func handleSArtist(arg string) error {
 		fmt.Printf("No result for %s.\n", arg)
 		return nil
 	}
+
+	Hist.AppendArtist(arg)
+
 	for i, a := range arts {
 		fmt.Printf("#%2d | %s\n", i, a.Name)
 	}

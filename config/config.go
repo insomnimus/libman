@@ -51,26 +51,26 @@ func Load(path string) (*Config, error) {
 	var c Config
 	err = toml.Unmarshal(data, &c)
 	if err != nil {
-		return nil, fmt.Errorf("malformed config file: %e\n", err)
+		return nil, fmt.Errorf("malformed config file: %w", err)
 	}
 
-	id := os.Getenv("LIBMAN_ID")
-	secret := os.Getenv("LIBMAN_SECRET")
-	uri := os.Getenv("LIBMAN_REDIRECT_URI")
-	cache := os.Getenv("LIBMAN_CACHE_PATH")
+	// id := os.Getenv("LIBMAN_ID")
+	// secret := os.Getenv("LIBMAN_SECRET")
+	// uri := os.Getenv("LIBMAN_REDIRECT_URI")
+	// cache := os.Getenv("LIBMAN_CACHE_PATH")
 
-	if id != "" {
-		c.ID = id
-	}
-	if secret != "" {
-		c.Secret = secret
-	}
-	if uri != "" {
-		c.RedirectURI = uri
-	}
-	if cache != "" {
-		c.CacheFile = cache
-	}
+	// if id != "" {
+	// c.ID = id
+	// }
+	// if secret != "" {
+	// c.Secret = secret
+	// }
+	// if uri != "" {
+	// c.RedirectURI = uri
+	// }
+	// if cache != "" {
+	// c.CacheFile = cache
+	// }
 
 	return &c, nil
 }

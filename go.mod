@@ -13,7 +13,7 @@ require (
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/net v0.0.0-20210716203947-853a461950ff // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

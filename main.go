@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/insomnimus/libman/auth"
@@ -13,22 +12,12 @@ import (
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.11.2"
+const VERSION = "0.12.0"
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("")
-
-	path := os.Getenv("LIBMAN_CONFIG_PATH")
-	if path == "" {
-		cfg, err := os.UserConfigDir()
-		if err != nil {
-			log.Fatalf("error: could not determine user config dir: %s\n", err)
-		}
-		path = filepath.Join(cfg, "libman.toml")
-	}
-
-	c, err := config.Load(path)
+	c, err := config.FromArgs(VERSION)
 	if err != nil {
 		log.Fatal(err)
 	}

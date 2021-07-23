@@ -202,6 +202,7 @@ func configFromArgs() (*config.Config, error) {
 				Name:        "hist-size",
 				Usage:       "History size, recommended to keep under 100.",
 				Destination: histSize,
+				EnvVars:     []string{"LIBMAN_HIST_SIZE"},
 			},
 		},
 	}

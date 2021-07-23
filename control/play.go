@@ -30,7 +30,7 @@ func playAlbum(a *spotify.SimpleAlbum) error {
 	err := client.PlayOpt(&spotify.PlayOptions{
 		DeviceID:        &device.ID,
 		PlaybackContext: &a.URI,
-		PlaybackOffset:  &spotify.PlaybackOffset{Position: 0},
+		// PlaybackOffset:  &spotify.PlaybackOffset{Position: 0}, // position being 0 makes json omit the field
 	})
 	if err != nil {
 		return err

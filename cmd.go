@@ -100,6 +100,7 @@ func configFromArgs() (*config.Config, error) {
 		secret     string
 		configPath string
 		rc         string
+		hist       string
 		redirect   string
 		prompt     string
 	)
@@ -136,6 +137,14 @@ func configFromArgs() (*config.Config, error) {
 				Usage:       "The redirect uri, must be localhost.",
 				Aliases:     []string{"u"},
 				EnvVars:     []string{"LIBMAN_REDIRECT_URI"},
+			},
+			&cli.StringFlag{
+				Name:        "hist-file",
+				Usage:       "The file where your search history will be saved to, for autocompletion.",
+				Aliases:     []string{"t"},
+				TakesFile:   true,
+				EnvVars:     []string{"LIBMAN_HIST_FILE"},
+				Destination: &hist,
 			},
 			&cli.StringFlag{
 				Name:        "config-file",
@@ -193,6 +202,7 @@ func configFromArgs() (*config.Config, error) {
 		cache != "" &&
 		redirect != "" &&
 		rc != "" &&
+		hist != "" &&
 		prompt != "" {
 		return &config.Config{
 			ID:          id,
@@ -200,6 +210,7 @@ func configFromArgs() (*config.Config, error) {
 			RedirectURI: redirect,
 			CacheFile:   cache,
 			RCFile:      rc,
+			HistFile:    hist,
 			Prompt:      prompt,
 		}, nil
 	}
@@ -232,6 +243,9 @@ func configFromArgs() (*config.Config, error) {
 	}
 	if cache != "" {
 		cfg.CacheFile = cache
+	}
+	if hist != "" {
+		cfg.HistFile = hist
 	}
 	if rc != "" {
 		cfg.RCFile = rc

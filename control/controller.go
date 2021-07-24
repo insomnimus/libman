@@ -65,6 +65,12 @@ func Start(
 		prompt = p
 	}
 
+	// sync playing status
+	cp, err := client.PlayerCurrentlyPlaying()
+	if err == nil {
+		isPlaying = cp.Playing
+	}
+
 	// execute the startup commands
 	if len(commands) > 0 {
 		var err error
@@ -87,7 +93,6 @@ func Start(
 	}
 
 	var input string
-	var err error
 	var cancelled bool
 	for {
 		rl.SetCompleter(completeCommand)

@@ -61,7 +61,7 @@ func Start(
 	// defer rl.Close() // can never be executed
 	client = c
 	user = u
-	if prompt != "" {
+	if p != "" {
 		prompt = p
 	}
 

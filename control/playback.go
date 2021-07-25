@@ -308,11 +308,6 @@ func queueTrack(t *spotify.FullTrack) error {
 	return err
 }
 
-func queueAlbum(*spotify.SimpleAlbum) error {
-	fmt.Println("Not yet implemented.")
-	return nil
-}
-
 func playUserLibrary() error {
 	if err := updateLibraryCache(); err != nil {
 		return err

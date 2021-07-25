@@ -208,14 +208,6 @@ func defaultSAlbumHandlers() handler.Set {
 			"Save an album from the list to your library.",
 		),
 		hand(
-			scmd.Queue,
-			"queue",
-			"Add an albums tracks to the playing queue.",
-			"queue <N>",
-			"Add all the tracks of an album from the list to your playing queue.",
-			"q", "que",
-		),
-		hand(
 			scmd.Help,
 			"help",
 			"Display help about a command.",

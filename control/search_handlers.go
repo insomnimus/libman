@@ -285,8 +285,6 @@ func sAlbumPage(albums []spotify.SimpleAlbum) error {
 			return playAlbum(&albums[n])
 		case scmd.Save:
 			return saveAlbum(albums[n])
-		case scmd.Queue:
-			return queueAlbum(&albums[n])
 		default:
 			panic(fmt.Sprintf("internal error: unhandled handler case: %s\n", h.Name))
 		}

@@ -11,17 +11,19 @@ import (
 var HistorySize uint32 = 66
 
 type History struct {
-	Artists  []string `json:"artists"`
-	Albums   []string `json:"albums"`
-	Tracks   []string `json:"tracks"`
-	modified bool
+	Artists   []string `json:"artists"`
+	Albums    []string `json:"albums"`
+	Tracks    []string `json:"tracks"`
+	Playlists []string `json:"playlists"`
+	modified  bool
 }
 
 func NewHistory() *History {
 	return &History{
-		Tracks:  make([]string, 0),
-		Albums:  make([]string, 0),
-		Artists: make([]string, 0),
+		Tracks:    make([]string, 0),
+		Albums:    make([]string, 0),
+		Artists:   make([]string, 0),
+		Playlists: make([]string, 0),
 	}
 }
 
@@ -97,4 +99,17 @@ func (h *History) Save(file string) error {
 		return err
 	}
 	return os.WriteFile(file, data, 0o644)
+}
+
+func (h *History) AppendPlaylist(s string) {
+	for _, p := range h.Playlists {
+		if strings.EqualFold(p, s) {
+			return
+		}
+	}
+	h.modified = true
+	h.Playlists = append(h.Playlists, s)
+	if len(h.Playlists) > int(HistorySize) {
+		h.Playlists = h.Playlists[:HistorySize]
+	}
 }

@@ -23,8 +23,6 @@ func handleSTrack(arg string) error {
 		return nil
 	}
 
-	Hist.AppendTrack(arg)
-
 	// print the results
 	for i, t := range tracks {
 		fmt.Printf("%-2d | %s by %s\n", i, t.Name, joinArtists(t.Artists))
@@ -48,8 +46,6 @@ func handleSAlbum(arg string) error {
 		return nil
 	}
 
-	Hist.AppendAlbum(arg)
-
 	for i, a := range albs {
 		fmt.Printf("#%2d | %s by %s\n", i, a.Name, joinArtists(a.Artists))
 	}
@@ -71,8 +67,6 @@ func handleSArtist(arg string) error {
 		fmt.Printf("No result for %s.\n", arg)
 		return nil
 	}
-
-	Hist.AppendArtist(arg)
 
 	for i, a := range arts {
 		fmt.Printf("#%2d | %s\n", i, a.Name)
@@ -130,6 +124,8 @@ func sTrackPage(tracks []spotify.FullTrack) error {
 					fmt.Printf("Please enter a value between 0 and %d.\n", len(tracks))
 					continue
 				}
+				// append the chosen item to hist
+				Hist.AppendTrack(tracks[n].Name)
 				return playTrack(&tracks[n])
 			}
 			fmt.Printf("%s is not a known command, alias or a number.\nRun `help` for a list of available commands.\n", arg)
@@ -141,16 +137,19 @@ func sTrackPage(tracks []spotify.FullTrack) error {
 		case scmd.Play:
 			n, ok := parseNumber(arg, len(tracks), h.Usage)
 			if ok {
+				Hist.AppendTrack(tracks[n].Name)
 				return playTrack(&tracks[n])
 			}
 		case scmd.Like:
 			n, ok := parseNumber(arg, len(tracks), h.Usage)
 			if ok {
+				Hist.AppendTrack(tracks[n].Name)
 				return likeTrack(&tracks[n])
 			}
 		case scmd.Queue:
 			n, ok := parseNumber(arg, len(tracks), h.Usage)
 			if ok {
+				Hist.AppendTrack(tracks[n].Name)
 				return queueTrack(&tracks[n])
 			}
 		case scmd.Save:
@@ -165,6 +164,7 @@ func sTrackPage(tracks []spotify.FullTrack) error {
 			}
 			n, ok := parseNumber(num, len(tracks), h.Usage)
 			if ok {
+				Hist.AppendTrack(tracks[n].Name)
 				pl := choosePlaylist(name)
 				if pl != nil {
 					return pl.addTrack(tracks[n])
@@ -205,6 +205,8 @@ func sArtistPage(artists []spotify.FullArtist) error {
 					fmt.Printf("Please enter a value between 0 and %d.\n", len(artists))
 					continue
 				}
+				// append to hist
+				Hist.AppendArtist(artists[n].Name)
 				return playArtist(&artists[n])
 			}
 			fmt.Printf("%s is not a known command, alias or a number.\nRun `help` for a list of available commands.\n", command)
@@ -219,6 +221,7 @@ func sArtistPage(artists []spotify.FullArtist) error {
 		if !ok {
 			continue
 		}
+		Hist.AppendArtist(artists[n].Name)
 		switch h.Cmd {
 		case scmd.Play:
 			return playArtist(&artists[n])
@@ -259,6 +262,8 @@ func sAlbumPage(albums []spotify.SimpleAlbum) error {
 					fmt.Printf("Please enter a value between 0 and %d.\n", len(albums))
 					continue
 				}
+				// append to hist
+				Hist.AppendAlbum(albums[n].Name)
 				return playAlbum(&albums[n])
 			}
 			fmt.Printf("%s is not a known command, alias or a number.\nRun `help` for a list of available commands.\n", command)
@@ -274,6 +279,7 @@ func sAlbumPage(albums []spotify.SimpleAlbum) error {
 		if !ok {
 			continue
 		}
+		Hist.AppendAlbum(albums[n].Name)
 		switch h.Cmd {
 		case scmd.Play:
 			return playAlbum(&albums[n])
@@ -316,6 +322,8 @@ func sPlaylistPage(pls []Playlist) error {
 					fmt.Printf("Please enter a value between 0 and %d.\n", len(pls))
 					continue
 				}
+				// append to hist
+				Hist.AppendPlaylist(pls[n].Name)
 				return playPlaylist(&pls[n])
 			}
 			fmt.Printf("%s is not a known command, alias or a number.\nRun `help` for a list of available commands.\n", command)
@@ -331,6 +339,7 @@ func sPlaylistPage(pls []Playlist) error {
 		if !ok {
 			continue
 		}
+		Hist.AppendPlaylist(pls[n].Name)
 		switch h.Cmd {
 		case scmd.Play:
 			return playPlaylist(&pls[n])

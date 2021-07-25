@@ -312,10 +312,7 @@ func DefaultHandlers() handler.Set {
 	_applySuggestPlaylist(set)
 	_applySuggestShuffleAndRepeat(set)
 	_applySuggestHelp(set)
-	_applySuggestTrack(set)
-	_applySuggestArtist(set)
-	_applySuggestAlbum(set)
-
+	_applySuggestHistory(set)
 	return set
 }
 
@@ -343,18 +340,17 @@ func _applySuggestHelp(set handler.Set) {
 	set.Find(cmd.Help).Complete = newWordCompleter(topics, "help")
 }
 
-func _applySuggestArtist(set handler.Set) {
+func _applySuggestHistory(set handler.Set) {
 	set.Find(cmd.PlayFirstArtist).Complete = dynamicCompleteFunc(&Hist.Artists, "play-artist", "part")
 	set.Find(cmd.SearchArtist).Complete = dynamicCompleteFunc(&Hist.Artists, "search-artist", "sart")
 	set.Find(cmd.RelatedArtists).Complete = dynamicCompleteFunc(&Hist.Artists, "related-artists", "related", "rel")
-}
 
-func _applySuggestAlbum(set handler.Set) {
 	set.Find(cmd.PlayFirstAlbum).Complete = dynamicCompleteFunc(&Hist.Albums, "palb", "play-album")
 	set.Find(cmd.SearchAlbum).Complete = dynamicCompleteFunc(&Hist.Albums, "salb", "search-album")
-}
 
-func _applySuggestTrack(set handler.Set) {
 	set.Find(cmd.PlayFirstTrack).Complete = dynamicCompleteFunc(&Hist.Tracks, "ptra", "play-track")
 	set.Find(cmd.SearchTrack).Complete = dynamicCompleteFunc(&Hist.Tracks, "stra", "search-track")
+
+	set.Find(cmd.PlayFirstPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists, "play-playlist", "ppla")
+	set.Find(cmd.SearchPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists, "spla", "search-playlist")
 }

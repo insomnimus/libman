@@ -21,9 +21,8 @@ func handlePFTrack(arg string) error {
 		return nil
 	}
 	// append to tracks history
-	Hist.AppendTrack(arg)
-	track := &tracks[0]
-	return playTrack(track)
+	Hist.AppendTrack(tracks[0].Name)
+	return playTrack(&tracks[0])
 }
 
 func handlePFAlbum(arg string) error {
@@ -40,7 +39,7 @@ func handlePFAlbum(arg string) error {
 		return nil
 	}
 
-	Hist.AppendAlbum(arg)
+	Hist.AppendAlbum(albs[0].Name)
 
 	return playAlbum(&albs[0])
 }
@@ -61,7 +60,7 @@ func handlePFArtist(arg string) error {
 		return nil
 	}
 
-	Hist.AppendArtist(arg)
+	Hist.AppendArtist(arts[0].Name)
 
 	return playArtist(&arts[0])
 }
@@ -81,5 +80,8 @@ func handlePFPlaylist(arg string) error {
 		fmt.Printf("no result for %q", arg)
 		return nil
 	}
+
+	Hist.AppendPlaylist(pls[0].Name)
+
 	return playPlaylist(&pls[0])
 }

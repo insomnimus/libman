@@ -1,7 +1,9 @@
 package control
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/insomnimus/libman/handler"
 	"github.com/insomnimus/libman/handler/cmd"
@@ -234,6 +236,23 @@ func DefaultHandlers() handler.Set {
 			handleRelatedArtists,
 		),
 		hand(
+			cmd.Recommend,
+			"recommend",
+			"Recommend tracks based on a playlist.",
+			"recommend [playlist]::[engine]",
+			`Generate recommendations based on a playlist.
+Recommendation style can be altered by specifying one of the following as the engine:
+-	normal: This is the default engine
+-	extreme: This will focus on the more extreme attributes of a playlist.
+-	min: This will choose a set of attributes and will request recommendations that are higher than its values.
+-	max: the opposite of min
+
+Example usage (assuming you have a playlist named "workout"):
+recommend workout::extreme`,
+			[]string{"rec"},
+			handleRecommend,
+		),
+		hand(
 			cmd.SetDevice,
 			"device",
 			"Change the playback device.",
@@ -313,6 +332,8 @@ func DefaultHandlers() handler.Set {
 	_applySuggestShuffleAndRepeat(set)
 	_applySuggestHelp(set)
 	_applySuggestHistory(set)
+	_applySuggestRecommend(set)
+
 	return set
 }
 
@@ -353,4 +374,51 @@ func _applySuggestHistory(set handler.Set) {
 
 	set.Find(cmd.PlayFirstPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists, "play-playlist", "ppla")
 	set.Find(cmd.SearchPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists, "spla", "search-playlist")
+}
+
+func _applySuggestRecommend(set handler.Set) {
+	set.Find(cmd.Recommend).Complete = func(buf string) []string {
+		if err := updateCache(); err != nil {
+			return nil
+		}
+		buf = strings.TrimPrefix(buf, " ")
+		command, arg := splitCmd(buf)
+		if !strings.EqualFold(command, "recommend") && !strings.EqualFold(command, "rec") {
+			return nil
+		}
+		// complete playlist name if there's no ::
+		c := make([]string, 0, len(cache))
+		if !strings.Contains(arg, "::") {
+			for _, p := range cache {
+				if hasPrefixFold(p.Name, arg) {
+					c = append(c, fmt.Sprintf("%s %s", command, p.Name))
+				}
+			}
+		} else {
+			// complete the engine
+			split := strings.SplitN(arg, "::", 2)
+			pl := split[0]
+			arg = ""
+			if len(split) > 1 {
+				arg = split[1]
+			}
+			if hasPrefixFold("normal", arg) {
+				c = append(c, fmt.Sprintf("%s %s::normal", command, pl))
+			}
+			if hasPrefixFold("extreme", arg) {
+				c = append(c, fmt.Sprintf("%s %s::extreme", command, pl))
+			}
+			if hasPrefixFold("max", arg) {
+				c = append(c, fmt.Sprintf("%s %s::max", command, pl))
+			}
+			if hasPrefixFold("min", arg) {
+				c = append(c, fmt.Sprintf("%s %s::min", command, pl))
+			}
+		}
+
+		if len(c) == 0 {
+			return nil
+		}
+		return c
+	}
 }

@@ -37,4 +37,5 @@ const (
 	Alias
 	Share
 	RelatedArtists
+	Recommend
 )

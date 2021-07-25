@@ -20,7 +20,6 @@ type Config struct {
 	HistSize int    `toml:"history_size" comment:"History size, applies to artist/album/track/playlist history independently." default:"66"`
 	Prompt   string `toml:"prompt" comment:"The libman shell prompt." default:"@libman>"`
 
-	// TODO: Check toml docs to make sure this field is ignored.
 	ConfigPath string `toml:"-"`
 }
 

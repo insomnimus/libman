@@ -337,6 +337,7 @@ func (p *PlaylistBuf) defaultHandlers() handler.Set {
 	}
 
 	// apply completions for some commands
+	set.Find(plcmd.Add).Complete = dynamicCompleteFunc(&Hist.Tracks, "add")
 	set.Find(plcmd.Help).Complete = newWordCompleter(set.CommandsAndAliases(), "help")
 	set.Find(plcmd.Display).Complete = newWordCompleter([]string{"display", "show", "list", "ls"}, "changes", "added", "removed")
 
@@ -411,8 +412,32 @@ func (p *PlaylistBuf) updateIndices() {
 	}
 }
 
-func (p *PlaylistBuf) handleAdd(string) {
-	fmt.Println("Not yet implemented.")
+func (p *PlaylistBuf) handleAdd(arg string) {
+	if arg == "" {
+		p.handlers.ShowUsage(plcmd.Add)
+		return
+	}
+	tracks, err := searchTrack(arg)
+	if err != nil {
+		fmt.Printf("Error: %s.\n", err)
+		return
+	}
+	if len(tracks) == 0 {
+		fmt.Printf("No result for %s.\n", arg)
+		return
+	}
+
+	for i, t := range tracks {
+		fmt.Printf("#%2d | %s by %s\n", i, t.Name, joinArtists(t.Artists))
+	}
+
+	n := readNumber(0, len(tracks))
+	if n < 0 {
+		fmt.Println("cancelled")
+		return
+	}
+
+	p.add(tracks[n])
 }
 
 func (p *PlaylistBuf) handleDisplay(arg string) {

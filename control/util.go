@@ -37,6 +37,7 @@ func readPrompt(addToHistory bool, format string, args ...interface{}) (reply st
 	var err error
 	reply, err = rl.Prompt(fmt.Sprintf(format, args...))
 	if errors.Is(err, io.EOF) {
+		rl.Close()
 		Terminator <- true
 		select {}
 	}

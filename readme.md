@@ -52,6 +52,17 @@ set some env variables:
 -	`LIBMAN_REDIRECT_URI`: Set it to the redirect URI you configured from the spotify developer portal.
 -	`LIBMAN_CACHE_PATH`:  This is not necessary but helpful, set it to a file where your session token will be saved so you won't have to authorize each time you launch libman.
 
+These can be accomplished from the command line as well:
+
+```sh
+libman config id <client_id>
+libman config secret <client_secret>
+libman config redirect-uri <redirect_uri>
+# there are more configuration options
+# run the command below to see them all:
+# libman config --list
+```
+
 That's it! Just launch libman and enjoy some music.
 
 # Tips & Tricks

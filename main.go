@@ -13,7 +13,7 @@ import (
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.15.3"
+const VERSION = "0.16.0"
 
 func main() {
 	log.SetFlags(0)
@@ -50,8 +50,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// load the commands from the rc file, if it exists
 	var commands []string
+
 	if c.RCFile != "" {
 		if _, err := os.Stat(c.RCFile); err == nil {
 			data, err := os.ReadFile(c.RCFile)
@@ -79,6 +81,6 @@ func main() {
 			log.Fatalf("error saving the token to the cache file: %s", err)
 		}
 	} else {
-		log.Println("warning: the access token is not saved because no cache file is specified")
+		log.Printf("Warning: the access token is not saved because no cache file is specified.\nYou can configure the cache file from the libman config file located at %s.\n", c.ConfigPath)
 	}
 }

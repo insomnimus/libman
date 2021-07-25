@@ -19,9 +19,19 @@ type Config struct {
 
 	HistSize int    `toml:"history_size" comment:"History size, applies to artist/album/track history independently." default:"66"`
 	Prompt   string `toml:"prompt" comment:"The libman shell prompt." commented:"true" default:"@libman>"`
+
+	// TODO: Check toml docs to make sure this field is ignored.
+	ConfigPath string `toml:"-"`
 }
 
 func DefaultConfig() Config {
+	configPath := os.Getenv("LIBMAN_CONFIG_PATH")
+	if configPath == "" {
+		p, err := os.UserConfigDir()
+		if err == nil {
+			configPath = filepath.Join(p, "libman.toml")
+		}
+	}
 	return Config{
 		ID:          os.Getenv("LIBMAN_ID"),
 		Secret:      os.Getenv("LIBMAN_SECRET"),
@@ -30,6 +40,7 @@ func DefaultConfig() Config {
 		RCFile:      RCPath(),
 		Prompt:      "@libman>",
 		HistSize:    66,
+		ConfigPath:  configPath,
 	}
 }
 
@@ -37,6 +48,7 @@ func Load(path string) (*Config, error) {
 	// create file if it doesn't exist
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		c := DefaultConfig()
+		c.ConfigPath = path
 		data, err := toml.Marshal(c)
 		if err != nil {
 			return nil, err
@@ -57,23 +69,7 @@ func Load(path string) (*Config, error) {
 		return nil, fmt.Errorf("malformed config file: %w", err)
 	}
 
-	// id := os.Getenv("LIBMAN_ID")
-	// secret := os.Getenv("LIBMAN_SECRET")
-	// uri := os.Getenv("LIBMAN_REDIRECT_URI")
-	// cache := os.Getenv("LIBMAN_CACHE_PATH")
-
-	// if id != "" {
-	// c.ID = id
-	// }
-	// if secret != "" {
-	// c.Secret = secret
-	// }
-	// if uri != "" {
-	// c.RedirectURI = uri
-	// }
-	// if cache != "" {
-	// c.CacheFile = cache
-	// }
+	c.ConfigPath = path
 
 	return &c, nil
 }
@@ -87,4 +83,24 @@ func RCPath() string {
 		return ""
 	}
 	return filepath.Join(u.HomeDir, ".libmanrc")
+}
+
+func ConfigPath() (string, error) {
+	path := os.Getenv("LIBMAN_CONFIG_PATH")
+	if path != "" {
+		return path, nil
+	}
+	path, err := os.UserConfigDir()
+	if err == nil {
+		path = filepath.Join(path, "libman.toml")
+	}
+	return path, err
+}
+
+func (c *Config) Save(path string) error {
+	data, err := toml.Marshal(c)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0o644)
 }

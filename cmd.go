@@ -10,6 +10,37 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+func printFlags(flags []cli.Flag) {
+	for _, f := range flags {
+		switch f := f.(type) {
+		case *cli.IntFlag:
+			fmt.Printf("  %s: %s",
+				joinFlags(f.Name, f.Aliases),
+				f.Usage)
+
+			if len(f.EnvVars) > 0 {
+				fmt.Printf("    [$%s]", f.EnvVars[0])
+			}
+			fmt.Println()
+		case *cli.StringFlag:
+			fmt.Printf("  %s: %s",
+				joinFlags(f.Name, f.Aliases),
+				f.Usage)
+
+			if len(f.EnvVars) > 0 {
+				fmt.Printf("    [$%s]", f.EnvVars[0])
+			}
+			fmt.Println()
+		case *cli.BoolFlag:
+			fmt.Printf("%s: %s\n", joinFlags(f.Name, f.Aliases),
+				f.Usage)
+
+		default:
+			panic("internal error: unhandled case switch")
+		}
+	}
+}
+
 func joinFlags(name string, aliases []string) string {
 	var shorts []string
 	var longs []string
@@ -46,34 +77,7 @@ func handleHelp(c *cli.Context) error {
 
 	fmt.Println("OPTIONS:")
 
-	for _, f := range c.App.VisibleFlags() {
-		switch f := f.(type) {
-		case *cli.IntFlag:
-			fmt.Printf("  %s: %s",
-				joinFlags(f.Name, f.Aliases),
-				f.Usage)
-
-			if len(f.EnvVars) > 0 {
-				fmt.Printf("    [$%s]", f.EnvVars[0])
-			}
-			fmt.Println()
-		case *cli.StringFlag:
-			fmt.Printf("  %s: %s",
-				joinFlags(f.Name, f.Aliases),
-				f.Usage)
-
-			if len(f.EnvVars) > 0 {
-				fmt.Printf("    [$%s]", f.EnvVars[0])
-			}
-			fmt.Println()
-		case *cli.BoolFlag:
-			fmt.Printf("%s: %s\n", joinFlags(f.Name, f.Aliases),
-				f.Usage)
-
-		default:
-			panic("internal error: unhandled case switch")
-		}
-	}
+	printFlags(c.App.VisibleFlags())
 
 	commands := c.App.VisibleCommands()
 	if len(commands) > 0 {
@@ -123,6 +127,7 @@ func configFromArgs() (*config.Config, error) {
 		HideHelp:    true,
 		HideVersion: true,
 		Action:      run,
+		Commands:    []*cli.Command{config.Command()},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "id",
@@ -211,6 +216,14 @@ func configFromArgs() (*config.Config, error) {
 		return nil, err
 	}
 
+	if configPath == "" {
+		p, err := os.UserConfigDir()
+		if err != nil {
+			return nil, fmt.Errorf("could not locate a config file: %w", err)
+		}
+		configPath = filepath.Join(p, "libman.toml")
+	}
+
 	// if all the flags are set, no need to read the config file
 	if id != "" &&
 		secret != "" &&
@@ -229,15 +242,8 @@ func configFromArgs() (*config.Config, error) {
 			HistFile:    hist,
 			HistSize:    *histSize,
 			Prompt:      prompt,
+			ConfigPath:  configPath,
 		}, nil
-	}
-
-	if configPath == "" {
-		p, err := os.UserConfigDir()
-		if err != nil {
-			return nil, fmt.Errorf("could not locate a config file: %w", err)
-		}
-		configPath = filepath.Join(p, "libman.toml")
 	}
 
 	cfg, err := config.Load(configPath)

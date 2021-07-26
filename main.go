@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/insomnimus/libman/history"
 
@@ -13,12 +15,16 @@ import (
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.17.0"
+const VERSION = "0.17.1"
 
-func main() {
+func init() {
 	log.SetFlags(0)
 	log.SetPrefix("")
 
+	rand.Seed(time.Now().UnixNano())
+}
+
+func main() {
 	// read config
 	c, err := configFromArgs()
 	if err != nil {

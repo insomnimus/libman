@@ -3,6 +3,8 @@ package control
 import (
 	"fmt"
 
+	"github.com/insomnimus/libman/glob"
+
 	"github.com/zmb3/spotify"
 )
 
@@ -141,4 +143,32 @@ func handleRemovePlaying(arg string) error {
 	}
 
 	return pl.removeTrack(*t)
+}
+
+func (p *Playlist) findTrack(pattern string) (*spotify.FullTrack, error) {
+	g, err := glob.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+	if err := p.makeFull(); err != nil {
+		return nil, err
+	}
+	for _, t := range p.Tracks.Tracks {
+		if g.MatchString(t.Track.Name) {
+			return &t.Track, nil
+		}
+	}
+	return nil, fmt.Errorf("%s: didn't match any track", pattern)
+}
+
+func (p *Playlist) trackNames() []string {
+	if err := p.makeFull(); err != nil {
+		return nil
+	}
+	c := make([]string, len(p.Tracks.Tracks))
+	for i, t := range p.Tracks.Tracks {
+		c[i] = t.Track.Name
+		// c[i] = p.Tracks.Tracks[i].Track.Name
+	}
+	return c
 }

@@ -2,8 +2,9 @@ package control
 
 import (
 	"fmt"
-	"sort"
 	"strings"
+
+	"github.com/insomnimus/libman/glob"
 
 	"github.com/insomnimus/libman/handler"
 	"github.com/insomnimus/libman/handler/cmd"
@@ -275,7 +276,10 @@ recommend workout::extreme`,
 			"play",
 			"Play a playlist from your library.",
 			"play [name]",
-			"Play a playlist from your library.\nIf the playlist name is not given, you will be prompted to choose one from a list of your playlists.",
+			`Play a playlist from your library.
+If the playlist name is not given, you will be prompted to choose one from a list of your playlists.
+You can use the syntax "playlist name::track name" to start playback from a specific track.
+Track names can include the "*" or the "?" wildcards.`,
 			[]string{"pl"},
 			handlePlayUserPlaylist,
 		),
@@ -342,13 +346,14 @@ recommend workout::extreme`,
 	_applySuggestHelp(set)
 	_applySuggestHistory(set)
 	_applySuggestRecommend(set)
+	_applySuggestPlaylistTrack(set)
 
 	return set
 }
 
 func _applySuggestPlaylist(set handler.Set) {
 	set.Find(cmd.EditPlaylistDetails).Complete = suggestPlaylist
-	set.Find(cmd.PlayUserPlaylist).Complete = suggestPlaylist
+	// set.Find(cmd.PlayUserPlaylist).Complete = suggestPlaylist
 	set.Find(cmd.SavePlaying).Complete = suggestPlaylist
 	set.Find(cmd.RemovePlaying).Complete = suggestPlaylist
 	set.Find(cmd.EditPlaylist).Complete = suggestPlaylist
@@ -356,43 +361,33 @@ func _applySuggestPlaylist(set handler.Set) {
 }
 
 func _applySuggestShuffleAndRepeat(set handler.Set) {
-	set.Find(cmd.Shuffle).Complete = newWordCompleter([]string{"on", "off"}, "sh", "shuffle")
-	set.Find(cmd.Repeat).Complete = newWordCompleter([]string{"off", "track", "context"}, "rep", "repeat")
+	set.Find(cmd.Shuffle).Complete = newWordCompleter("on", "off")
+	set.Find(cmd.Repeat).Complete = newWordCompleter("off", "track", "context")
 }
 
 func _applySuggestHelp(set handler.Set) {
-	topics := make([]string, 0, len(set))
-	for _, h := range set {
-		topics = append(topics, h.Name)
-		topics = append(topics, h.Aliases...)
-	}
-	sort.Strings(topics)
-	set.Find(cmd.Help).Complete = newWordCompleter(topics, "help")
+	set.Find(cmd.Help).Complete = set.CompleteHelp
 }
 
 func _applySuggestHistory(set handler.Set) {
-	set.Find(cmd.PlayFirstArtist).Complete = dynamicCompleteFunc(&Hist.Artists, "play-artist", "part")
-	set.Find(cmd.SearchArtist).Complete = dynamicCompleteFunc(&Hist.Artists, "search-artist", "sart")
-	set.Find(cmd.RelatedArtists).Complete = dynamicCompleteFunc(&Hist.Artists, "related-artists", "related", "rel")
+	set.Find(cmd.PlayFirstArtist).Complete = dynamicCompleteFunc(&Hist.Artists)
+	set.Find(cmd.SearchArtist).Complete = dynamicCompleteFunc(&Hist.Artists)
 
-	set.Find(cmd.PlayFirstAlbum).Complete = dynamicCompleteFunc(&Hist.Albums, "palb", "play-album")
-	set.Find(cmd.SearchAlbum).Complete = dynamicCompleteFunc(&Hist.Albums, "salb", "search-album")
+	set.Find(cmd.RelatedArtists).Complete = dynamicCompleteFunc(&Hist.Artists, "related-artists")
 
-	set.Find(cmd.PlayFirstTrack).Complete = dynamicCompleteFunc(&Hist.Tracks, "ptra", "play-track")
-	set.Find(cmd.SearchTrack).Complete = dynamicCompleteFunc(&Hist.Tracks, "stra", "search-track")
+	set.Find(cmd.PlayFirstAlbum).Complete = dynamicCompleteFunc(&Hist.Albums)
+	set.Find(cmd.SearchAlbum).Complete = dynamicCompleteFunc(&Hist.Albums)
 
-	set.Find(cmd.PlayFirstPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists, "play-playlist", "ppla")
-	set.Find(cmd.SearchPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists, "spla", "search-playlist")
+	set.Find(cmd.PlayFirstTrack).Complete = dynamicCompleteFunc(&Hist.Tracks)
+	set.Find(cmd.SearchTrack).Complete = dynamicCompleteFunc(&Hist.Tracks)
+
+	set.Find(cmd.PlayFirstPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists)
+	set.Find(cmd.SearchPlaylist).Complete = dynamicCompleteFunc(&Hist.Playlists)
 }
 
 func _applySuggestRecommend(set handler.Set) {
-	set.Find(cmd.Recommend).Complete = func(buf string) []string {
+	set.Find(cmd.Recommend).Complete = func(command, arg string) []string {
 		if err := updateCache(); err != nil {
-			return nil
-		}
-		buf = strings.TrimPrefix(buf, " ")
-		command, arg := splitCmd(buf)
-		if !strings.EqualFold(command, "recommend") && !strings.EqualFold(command, "rec") {
 			return nil
 		}
 		// complete playlist name if there's no ::
@@ -429,5 +424,42 @@ func _applySuggestRecommend(set handler.Set) {
 			return nil
 		}
 		return c
+	}
+}
+
+func _applySuggestPlaylistTrack(set handler.Set) {
+	set.Find(cmd.PlayUserPlaylist).Complete = func(command, arg string) []string {
+		if !strings.Contains(arg, "::") {
+			return suggestPlaylist(command, arg)
+		}
+		updateCache()
+		split := strings.SplitN(arg, "::", 2)
+		left := strings.TrimSpace(split[0])
+		var right string
+		if len(split) > 1 {
+			right = strings.TrimPrefix(split[1], " ")
+		}
+
+		items := make([]string, 0, len(cache))
+		var g *glob.Regexp
+		if strings.Contains(right, "*") {
+			g, _ = glob.Compile(right)
+		}
+
+		for _, p := range cache {
+			if strings.EqualFold(p.Name, left) {
+				fmt.Println(left, right)
+				for _, t := range p.trackNames() {
+					if (g == nil && hasPrefixFold(t, right)) ||
+						(g != nil && g.MatchString(t)) {
+						items = append(items, fmt.Sprintf("%s %s::%s", command, left, t))
+					}
+				}
+			}
+		}
+		if len(items) == 0 {
+			return nil
+		}
+		return items
 	}
 }

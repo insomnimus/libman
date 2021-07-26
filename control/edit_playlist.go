@@ -338,8 +338,8 @@ func (p *PlaylistBuf) defaultHandlers() handler.Set {
 
 	// apply completions for some commands
 	set.Find(plcmd.Add).Complete = dynamicCompleteFunc(&Hist.Tracks, "add")
-	set.Find(plcmd.Help).Complete = newWordCompleter(set.CommandsAndAliases(), "help")
-	set.Find(plcmd.Display).Complete = newWordCompleter([]string{"display", "show", "list", "ls"}, "changes", "added", "removed")
+	set.Find(plcmd.Help).Complete = set.CompleteHelp
+	set.Find(plcmd.Display).Complete = newWordCompleter("changes", "added", "removed")
 
 	return set
 }

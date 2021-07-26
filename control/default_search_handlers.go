@@ -74,19 +74,12 @@ func defaultSTrackHandlers() handler.Set {
 	}
 
 	set.Find(scmd.Help).Run = set.RunHelp
-	set.Find(scmd.Help).Complete = newWordCompleter(set.CommandsAndAliases(), "help")
-	set.Find(scmd.Save).Complete = func(buf string) []string {
-		buf = strings.TrimPrefix(buf, " ")
-		spaceLast := strings.HasSuffix(buf, " ")
-		command, arg := splitCmd(buf)
-		if !strings.EqualFold(command, "save") && !strings.EqualFold(command, "add") {
+	set.Find(scmd.Help).Complete = newWordCompleter(set.CommandsAndAliases()...)
+	set.Find(scmd.Save).Complete = func(command, arg string) []string {
+		if !strings.Contains(arg, " ") {
 			return nil
 		}
-		// do not complete if the <N> field is not there
-		if !spaceLast && !strings.Contains(arg, " ") {
-			return nil
-		}
-		_, arg = splitCmd(arg)
+		left, arg := splitCmd(arg)
 		// complete arg (playlist name)
 		if err := updateCache(); err != nil {
 			return nil
@@ -94,14 +87,14 @@ func defaultSTrackHandlers() handler.Set {
 		pls := make([]string, 0, len(cache))
 		if arg == "" {
 			for _, p := range cache {
-				pls = append(pls, buf+p.Name)
+				pls = append(pls, fmt.Sprintf("%s %s %s", command, left, p.Name))
 			}
 			return pls
 		}
 
 		for _, p := range cache {
 			if hasPrefixFold(p.Name, arg) {
-				pls = append(pls, fmt.Sprintf("%s %s", buf, p.Name))
+				pls = append(pls, fmt.Sprintf("%s %s %s", command, left, p.Name))
 			}
 		}
 		// return nil if there are no candidates
@@ -162,7 +155,7 @@ func defaultSArtistHandlers() handler.Set {
 		),
 	}
 
-	set.Find(scmd.Help).Complete = newWordCompleter(set.CommandsAndAliases(), "help")
+	set.Find(scmd.Help).Complete = set.CompleteHelp
 	set.Find(scmd.Help).Run = set.RunHelp
 
 	return set
@@ -217,7 +210,7 @@ func defaultSAlbumHandlers() handler.Set {
 	}
 
 	set.Find(scmd.Help).Run = set.RunHelp
-	set.Find(scmd.Help).Complete = newWordCompleter(set.CommandsAndAliases(), "help")
+	set.Find(scmd.Help).Complete = set.CompleteHelp
 
 	return set
 }
@@ -271,7 +264,7 @@ func defaultSPlaylistHandlers() handler.Set {
 	}
 
 	set.Find(scmd.Help).Run = set.RunHelp
-	set.Find(scmd.Help).Complete = newWordCompleter(set.CommandsAndAliases(), "help")
+	set.Find(scmd.Help).Complete = set.CompleteHelp
 
 	return set
 }

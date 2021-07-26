@@ -15,7 +15,7 @@ type Handler struct {
 	About    string
 	Usage    string
 	Run      func(string) error
-	Complete func(string) []string
+	Complete func(string, string) []string
 }
 
 type Set []Handler
@@ -107,11 +107,12 @@ func (s Set) CommandsAndAliases() []string {
 	return items
 }
 
-func (s Set) Names() (names []string) {
-	for _, h := range s {
-		names = append(names, h.Name)
+func (s Set) Names() []string {
+	names := make([]string, len(s))
+	for i := range s {
+		names[i] = s[i].Name
 	}
-	return
+	return names
 }
 
 func (s Set) Complete(buf string) []string {
@@ -121,16 +122,16 @@ func (s Set) Complete(buf string) []string {
 		return s.Names()
 	}
 	c := make([]string, 0, len(s))
-	hasSpace := strings.Contains(buf, " ")
+	if strings.Contains(buf, " ") {
+		command, arg := util.SplitCmd(buf)
+		h := s.Match(command)
+		if h == nil {
+			return nil
+		}
+		return h.Complete(command, arg)
+	}
 	// check handlers
 	for _, h := range s {
-		if hasSpace {
-			candidates := h.Complete(buf)
-			if candidates != nil {
-				return candidates
-			}
-			continue
-		}
 		// complete the command itself
 		if util.HasPrefixFold(h.Name, buf) {
 			c = append(c, h.Name)
@@ -159,4 +160,23 @@ func (s Set) RunHelp(arg string) error {
 		fmt.Println(h.GoString())
 	}
 	return nil
+}
+
+func (s Set) CompleteHelp(command, arg string) []string {
+	candidates := make([]string, 0, len(s))
+	for _, h := range s {
+		if util.HasPrefixFold(h.Name, arg) {
+			candidates = append(candidates, fmt.Sprintf("%s %s", command, h.Name))
+		}
+		for _, a := range h.Aliases {
+			if util.HasPrefixFold(a, arg) {
+				candidates = append(candidates, fmt.Sprintf("%s %s", command, a))
+			}
+		}
+	}
+
+	if len(candidates) == 0 {
+		return nil
+	}
+	return candidates
 }

@@ -2,6 +2,7 @@ package control
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/zmb3/spotify"
 )
@@ -77,15 +78,49 @@ func playPlaylist(p *Playlist) error {
 }
 
 func handlePlayUserPlaylist(arg string) error {
-	pl := choosePlaylist(arg)
-	if pl == nil {
+	var p *Playlist
+	if strings.Contains(arg, "::") {
+		split := strings.SplitN(arg, "::", 2)
+		left := strings.TrimSpace(split[0])
+		var right string
+		if len(split) > 1 {
+			right = strings.TrimSpace(split[1])
+		}
+		p = choosePlaylist(left)
+		if p == nil {
+			return nil
+		}
+		if right != "" {
+			t, err := p.findTrack(right)
+			if err != nil {
+				return err
+			}
+			// play with context as offset
+			err = client.PlayOpt(&spotify.PlayOptions{
+				PlaybackContext: &p.URI,
+				PlaybackOffset: &spotify.PlaybackOffset{
+					URI: t.URI,
+				},
+			})
+			if err == nil {
+				fmt.Printf("Playing %s from %s.\n", t.Name, p.Name)
+				isPlaying = true
+			}
+			return err
+		}
+	}
+
+	if p == nil {
+		p = choosePlaylist(arg)
+	}
+	if p == nil {
 		return nil
 	}
 
-	err := playPlaylist(pl)
+	err := playPlaylist(p)
 	if err != nil {
 		return err
 	}
-	lastPl = pl
+	lastPl = p
 	return nil
 }

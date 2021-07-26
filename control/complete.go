@@ -20,16 +20,19 @@ func completeCommand(buf string) (c []string) {
 	if buf == "" {
 		return append(c, handlers.Names()...)
 	}
-	hasSpace := strings.Contains(buf, " ")
+
+	// complete the argument , if the command is already typed
+	if strings.Contains(buf, " ") {
+		command, arg := splitCmd(buf)
+		h := handlers.Match(command)
+		if h == nil {
+			return nil
+		}
+		return h.Complete(command, arg)
+	}
+
 	// check handlers
 	for _, h := range handlers {
-		if hasSpace {
-			candidates := h.Complete(buf)
-			if candidates != nil {
-				return candidates
-			}
-			continue
-		}
 		// complete the command itself
 		if hasPrefixFold(h.Name, buf) {
 			c = append(c, h.Name)
@@ -54,30 +57,16 @@ func completeBool(buf string) (c []string) {
 	return c
 }
 
-func completeNothing(string) []string {
+func completeNothing(string, string) []string {
 	return nil
 }
 
-func suggestPlaylist(buf string) []string {
+func suggestPlaylist(command, arg string) []string {
 	updateCache()
 	pls := make([]string, 0, len(cache))
-	command, name := splitCmd(buf)
-	if command == "" {
-		return nil
-	}
-	// do nothing if the command is not a playlist command
 	h := handlers.Match(command)
-	if h == nil ||
-		!(h.Cmd == cmd.PlayUserPlaylist ||
-			h.Cmd == cmd.EditPlaylistDetails ||
-			h.Cmd == cmd.SavePlaying ||
-			h.Cmd == cmd.RemovePlaying ||
-			h.Cmd == cmd.EditPlaylist ||
-			h.Cmd == cmd.DeletePlaylist) {
-		return nil
-	}
 
-	if name == "" {
+	if arg == "" {
 		// return all playlist names
 		for _, p := range cache {
 			// do not suggest followed playlists for the edit, save or rm commands
@@ -90,6 +79,9 @@ func suggestPlaylist(buf string) []string {
 			pls = append(pls,
 				fmt.Sprintf("%s %s", command, p.Name))
 		}
+		if len(pls) == 0 {
+			return nil
+		}
 		return pls
 	}
 
@@ -101,30 +93,21 @@ func suggestPlaylist(buf string) []string {
 			h.Cmd == cmd.RemovePlaying) {
 			continue
 		}
-		if hasPrefixFold(p.Name, name) {
+		if hasPrefixFold(p.Name, arg) {
 			pls = append(pls,
 				fmt.Sprintf("%s %s", command, p.Name))
 		}
+	}
+	if len(pls) == 0 {
+		return nil
 	}
 	return pls
 }
 
 // generates a completer for the second word of a command
 // will return nil if the command is not a match of given command names (commands parameter)
-func newWordCompleter(cand []string, commands ...string) func(string) []string {
-	return func(buf string) []string {
-		buf = strings.TrimPrefix(buf, " ") // ignore leading space
-		command, arg := splitCmd(buf)
-		isMatch := false
-		for _, c := range commands {
-			if strings.EqualFold(command, c) {
-				isMatch = true
-				break
-			}
-		}
-		if !isMatch {
-			return nil
-		}
+func newWordCompleter(cand ...string) func(string, string) []string {
+	return func(command, arg string) []string {
 		items := make([]string, 0, len(cand))
 		for _, s := range cand {
 			if hasPrefixFold(s, arg) {
@@ -140,20 +123,8 @@ func newWordCompleter(cand []string, commands ...string) func(string) []string {
 	}
 }
 
-func dynamicCompleteFunc(vec *[]string, commands ...string) func(string) []string {
-	return func(buf string) []string {
-		buf = strings.TrimPrefix(buf, " ")
-		command, arg := splitCmd(buf)
-		isMatch := false
-		for _, cmd := range commands {
-			if strings.EqualFold(cmd, command) {
-				isMatch = true
-				break
-			}
-		}
-		if !isMatch {
-			return nil
-		}
+func dynamicCompleteFunc(vec *[]string, commands ...string) func(string, string) []string {
+	return func(command, arg string) []string {
 		items := make([]string, 0, len(*vec))
 		for _, s := range *vec {
 			if hasPrefixFold(s, arg) {

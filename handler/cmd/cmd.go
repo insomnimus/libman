@@ -31,6 +31,7 @@ const (
 	Help
 	PlayUserPlaylist
 	PlayLibrary
+	PlayTopTracks
 	SetDevice
 	Show
 	Prompt

@@ -2,7 +2,9 @@ package control
 
 import (
 	"fmt"
+	"strconv"
 
+	"github.com/insomnimus/libman/handler/cmd"
 	"github.com/zmb3/spotify"
 )
 
@@ -276,6 +278,46 @@ func handleDislikePlaying(string) error {
 	if err == nil {
 		libraryCache.removeByID(t.ID)
 		fmt.Printf("Removed %s from your library.\n", t.Name)
+	}
+	return err
+}
+
+func handlePlayTopTracks(arg string) error {
+	limit := 20
+	if arg != "" {
+		n, err := strconv.Atoi(arg)
+		if err != nil || n <= 0 {
+			handlers.ShowUsage(cmd.PlayTopTracks)
+			return nil
+		}
+		if n > 50 {
+			fmt.Println("Error: the max limit is 50.")
+			return nil
+		}
+		limit = n
+	}
+
+	page, err := client.CurrentUsersTopTracksOpt(&spotify.Options{Limit: &limit})
+	if err != nil {
+		return err
+	}
+	if len(page.Tracks) == 0 {
+		fmt.Println("Spotify says you have no top tracks...")
+		return nil
+	}
+
+	uris := make([]spotify.URI, len(page.Tracks))
+	fmt.Printf("Playing your top %d tracks (recent):\n", len(page.Tracks))
+	for i, t := range page.Tracks {
+		fmt.Printf("-\t%s by %s\n", t.Name, joinArtists(t.Artists))
+		uris[i] = t.URI
+	}
+
+	err = client.PlayOpt(&spotify.PlayOptions{
+		URIs: uris,
+	})
+	if err == nil {
+		isPlaying = true
 	}
 	return err
 }

@@ -287,6 +287,9 @@ func configFromArgs() (*config.Config, error) {
 	}
 	if dataHome != "" {
 		cfg.DataHome = dataHome
+		if cfg.CacheFile == "" {
+			cfg.CacheFile = filepath.Join(dataHome, "libman_token_cachejson")
+		}
 	}
 	return cfg, nil
 }

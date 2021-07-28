@@ -24,7 +24,7 @@ func handleCreatePlaylist(arg string) error {
 	desc := readString("playlist description: ")
 	pub := readBool("should the playlist be public?")
 
-	if !readBool("confirm\ncreating new playlist %s, proceed?", arg) {
+	if !readBool("confirm: creating new playlist %s, proceed?", arg) {
 		fmt.Println("cancelled")
 		return nil
 	}
@@ -34,7 +34,7 @@ func handleCreatePlaylist(arg string) error {
 		return err
 	}
 
-	fmt.Printf("created new playlist %q", arg)
+	fmt.Printf("created new playlist %q\n", arg)
 	cache.insertFull(0, *pl)
 	return nil
 }

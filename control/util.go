@@ -21,7 +21,10 @@ var (
 func readBool(format string, args ...interface{}) bool {
 	rl.SetCompleter(completeBool)
 	for {
-		reply := readString(format+" [y/n]: ", args...)
+		reply, cancelled := readPrompt(false, format+" [y/n]: ", args...)
+		if cancelled {
+			return false
+		}
 		switch strings.ToLower(reply) {
 		case "y", "yes":
 			return true
@@ -39,7 +42,8 @@ func readPrompt(addToHistory bool, format string, args ...interface{}) (reply st
 	if errors.Is(err, io.EOF) {
 		rl.Close()
 		Terminator <- true
-		select {}
+		for {
+		}
 	}
 	if err != nil {
 		return "", true

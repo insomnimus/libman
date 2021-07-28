@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mattn/go-zglob"
+
 	"github.com/insomnimus/libman/handler/cmd"
 )
 
@@ -138,4 +140,12 @@ func dynamicCompleteFunc(vec *[]string, commands ...string) func(string, string)
 		}
 		return items
 	}
+}
+
+func suggestPath(buf string) []string {
+	items, err := zglob.Glob(buf + "*")
+	if err != nil {
+		return nil
+	}
+	return items
 }

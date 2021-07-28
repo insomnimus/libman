@@ -339,6 +339,24 @@ Track names can include the "*" or the "?" wildcards.`,
 			[]string{"share", "cp"},
 			handleSharePlaying,
 		),
+		hand(
+			cmd.ImportPlaylist,
+			"import-playlist",
+			"Import a playlist from a previously exported file.",
+			"import-playlist <path>",
+			"Import a playlist from a previously exported file.",
+			[]string{"import"},
+			handleImportPlaylist,
+		),
+		hand(
+			cmd.ExportPlaylist,
+			"export-playlist",
+			"Export a playlist.",
+			"export-playlist [playlist]",
+			"Export a playlist from your library to a file.",
+			[]string{"export"},
+			handleExportPlaylist,
+		),
 	}
 
 	_applySuggestPlaylist(set)
@@ -347,6 +365,7 @@ Track names can include the "*" or the "?" wildcards.`,
 	_applySuggestHistory(set)
 	_applySuggestRecommend(set)
 	_applySuggestPlaylistTrack(set)
+	_applySuggestImportPath(set)
 
 	return set
 }
@@ -358,6 +377,7 @@ func _applySuggestPlaylist(set handler.Set) {
 	set.Find(cmd.RemovePlaying).Complete = suggestPlaylist
 	set.Find(cmd.EditPlaylist).Complete = suggestPlaylist
 	set.Find(cmd.DeletePlaylist).Complete = suggestPlaylist
+	set.Find(cmd.ExportPlaylist).Complete = suggestPlaylist
 }
 
 func _applySuggestShuffleAndRepeat(set handler.Set) {
@@ -459,6 +479,16 @@ func _applySuggestPlaylistTrack(set handler.Set) {
 		}
 		if len(items) == 0 {
 			return nil
+		}
+		return items
+	}
+}
+
+func _applySuggestImportPath(set handler.Set) {
+	set.Find(cmd.ImportPlaylist).Complete = func(command string, arg string) []string {
+		items := suggestPath(arg)
+		for i := range items {
+			items[i] = fmt.Sprintf("%s %s", command, items[i])
 		}
 		return items
 	}

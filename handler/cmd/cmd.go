@@ -39,4 +39,6 @@ const (
 	Share
 	RelatedArtists
 	Recommend
+	ImportPlaylist
+	ExportPlaylist
 )

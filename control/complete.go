@@ -2,6 +2,7 @@ package control
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/mattn/go-zglob"
@@ -143,7 +144,13 @@ func dynamicCompleteFunc(vec *[]string, commands ...string) func(string, string)
 }
 
 func suggestPath(buf string) []string {
-	items, err := zglob.Glob(buf + "*")
+	var err error
+	var items []string
+	if DataHome == "" || filepath.IsAbs(buf) {
+		items, err = zglob.Glob(buf + "*")
+	} else {
+		items, err = zglob.Glob(DataHome + buf + "*")
+	}
 	if err != nil {
 		return nil
 	}

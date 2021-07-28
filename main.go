@@ -15,7 +15,7 @@ import (
 	// "github.com/vrischmann/userdir"
 )
 
-const VERSION = "0.20.0"
+const VERSION = "0.20.1"
 
 func init() {
 	log.SetFlags(0)
@@ -30,6 +30,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	control.DataHome = c.DataHome
 
 	// load hist file, if any
 	if c.HistFile != "" {

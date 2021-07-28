@@ -44,6 +44,8 @@ var (
 	Terminator = make(chan bool, 1)
 
 	Hist = history.NewHistory() // don't want it nil
+
+	DataHome string
 )
 
 func init() {

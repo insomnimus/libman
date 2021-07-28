@@ -19,6 +19,7 @@ var configFields = map[string]func(*Config) interface{}{
 	"history-size": func(c *Config) interface{} { return &c.HistSize },
 	"rc-file":      func(c *Config) interface{} { return &c.RCFile },
 	"prompt":       func(c *Config) interface{} { return &c.Prompt },
+	"data-home":    func(c *Config) interface{} { return &c.DataHome },
 }
 
 func runHelp(c *cli.Context) {

@@ -16,6 +16,7 @@ type Config struct {
 	CacheFile   string `toml:"cache_file_path" comment:"Full file path of the libman token cache file.\nThe $LIBMAN_CACHE_PATH will override this, if set."`
 	RCFile      string `toml:"libmanrc_path" comment:"The location of the startup script file. $LIBMAN_RC_PATH overrides this field if set."`
 	HistFile    string `toml:"history_file" comment:"File where artist, album and track history will be saved to. $LIBMAN_HIST_FILE overrides this, if set."`
+	DataHome    string `toml:"data_home" comment:"$LIBMAN_DATA_HOME will override this, if set. The place where the exported playlist will be saved to, if the path given is not absolute."`
 
 	HistSize int    `toml:"history_size" comment:"History size, applies to artist/album/track/playlist history independently." default:"66"`
 	Prompt   string `toml:"prompt" comment:"The libman shell prompt." default:"@libman>"`
@@ -24,13 +25,25 @@ type Config struct {
 }
 
 func DefaultConfig() Config {
+	dataHome := os.Getenv("LIBMAN_DATA_HOME")
+	if dataHome == "" {
+		p, err := os.UserCacheDir()
+		if err == nil {
+			dataHome = filepath.Join(p, "libman")
+			os.MkdirAll(dataHome, 0o700)
+		}
+	}
+
 	configPath := os.Getenv("LIBMAN_CONFIG_PATH")
 	if configPath == "" {
 		p, err := os.UserConfigDir()
 		if err == nil {
+			p = filepath.Join(p, "libman")
+			os.MkdirAll(p, 0o644)
 			configPath = filepath.Join(p, "libman.toml")
 		}
 	}
+
 	return Config{
 		ID:          os.Getenv("LIBMAN_ID"),
 		Secret:      os.Getenv("LIBMAN_SECRET"),
@@ -40,6 +53,7 @@ func DefaultConfig() Config {
 		Prompt:      "@libman>",
 		HistSize:    66,
 		ConfigPath:  configPath,
+		DataHome:    dataHome,
 	}
 }
 

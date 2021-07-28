@@ -2,6 +2,7 @@ package control
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/insomnimus/libman/control/store"
@@ -82,6 +83,9 @@ func handleExportPlaylist(arg string) error {
 	if !strings.HasSuffix(filename, ".json") {
 		filename += ".json"
 	}
+	if !filepath.IsAbs(filename) {
+		filename = filepath.Join(DataHome, filename)
+	}
 
 	if err := p.makeFull(); err != nil {
 		return err
@@ -103,11 +107,16 @@ func handleImportPlaylist(arg string) error {
 	)
 
 	if arg == "" {
+		rl.SetCompleter(suggestPath)
 		arg = readString("Enter the path of a previously exported playlist: ")
 		if arg == "" {
 			fmt.Println("cancelled")
 			return nil
 		}
+	}
+
+	if DataHome != "" && !filepath.IsAbs(arg) {
+		arg = filepath.Join(DataHome, arg)
 	}
 
 	p, err := store.ImportFrom(arg)

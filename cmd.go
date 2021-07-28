@@ -117,6 +117,7 @@ func configFromArgs() (*config.Config, error) {
 		redirect   string
 		prompt     string
 		histSize   *int
+		dataHome   string
 	)
 
 	app := &cli.App{
@@ -152,6 +153,12 @@ func configFromArgs() (*config.Config, error) {
 				Usage:       "The redirect uri, must be localhost.",
 				Aliases:     []string{"u"},
 				EnvVars:     []string{"LIBMAN_REDIRECT_URI"},
+			},
+			&cli.StringFlag{
+				Name:        "data-home",
+				Destination: &dataHome,
+				Usage:       "The path to the libman data directory where the exported playlists will be stored.",
+				EnvVars:     []string{"LIBMAN_DATA_HOME"},
 			},
 			&cli.StringFlag{
 				Name:        "hist-file",
@@ -232,7 +239,8 @@ func configFromArgs() (*config.Config, error) {
 		rc != "" &&
 		hist != "" &&
 		histSize != nil &&
-		prompt != "" {
+		prompt != "" &&
+		dataHome != "" {
 		return &config.Config{
 			ID:          id,
 			Secret:      secret,
@@ -243,6 +251,7 @@ func configFromArgs() (*config.Config, error) {
 			HistSize:    *histSize,
 			Prompt:      prompt,
 			ConfigPath:  configPath,
+			DataHome:    dataHome,
 		}, nil
 	}
 
@@ -276,6 +285,8 @@ func configFromArgs() (*config.Config, error) {
 	if prompt != "" {
 		cfg.Prompt = prompt
 	}
-
+	if dataHome != "" {
+		cfg.DataHome = dataHome
+	}
 	return cfg, nil
 }

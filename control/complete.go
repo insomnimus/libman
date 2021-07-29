@@ -149,7 +149,7 @@ func suggestPath(buf string) []string {
 	if DataHome == "" || filepath.IsAbs(buf) {
 		items, err = zglob.Glob(buf + "*")
 	} else {
-		items, err = zglob.Glob(DataHome + buf + "*")
+		items, err = zglob.Glob(filepath.Join(DataHome, buf+"*"))
 	}
 	if err != nil {
 		return nil

@@ -70,39 +70,6 @@ func handleDeletePlaylist(arg string) error {
 	return nil
 }
 
-func choosePlaylist(arg string) *Playlist {
-	// if the cache is nil, initialize it
-	err := updateCache()
-	if err != nil {
-		fmt.Printf("Error updating playlist cache: %s.\n", err)
-		return nil
-	}
-
-	if len(cache) == 0 {
-		fmt.Println("you don't seem to have any playlists")
-		return nil
-	}
-
-	if arg != "" {
-		pl := cache.findByName(arg)
-		if pl == nil {
-			fmt.Printf("You don't seem to have a playlist named %q.\n", arg)
-		}
-		return pl
-	}
-
-	for i, p := range cache {
-		fmt.Printf("%-2d | %s\n", i, p.Name)
-	}
-
-	n := readNumber(0, len(cache))
-	if n == -1 {
-		fmt.Println("cancelled")
-		return nil
-	}
-	return cache.get(n)
-}
-
 func handleEditPlaylistDetails(arg string) error {
 	pl := choosePlaylist(arg)
 	if pl == nil {
@@ -320,4 +287,105 @@ func handlePlayTopTracks(arg string) error {
 		isPlaying = true
 	}
 	return err
+}
+
+func choosePlaylist(arg string) *Playlist {
+	// if the cache is nil, initialize it
+	if err := updateCache(); err != nil {
+		fmt.Printf("Error updating playlist cache: %s.\n", err)
+		return nil
+	}
+
+	if len(cache) == 0 {
+		fmt.Println("you don't seem to have any playlists")
+		return nil
+	}
+
+	if arg != "" {
+		pl := cache.findByName(arg)
+		if pl == nil {
+			fmt.Printf("You don't seem to have a playlist named %q.\n", arg)
+		}
+		return pl
+	}
+
+	totalPages := len(cache) / 20
+	if totalPages == 0 || len(cache)%20 != 0 {
+		totalPages++
+	}
+
+	min := func(a, b int) int {
+		if a < b {
+			return a
+		} else {
+			return b
+		}
+	}
+
+	display := func(page int) {
+		start := page * 20
+		if start > len(cache) {
+			return
+		}
+		end := min(page*20+20, len(cache))
+
+		fmt.Printf("Displaying page %d of %d.\n", page+1, totalPages)
+		for i, p := range cache[start:end] {
+			fmt.Printf("%3d | %s\n", i+start, p.Name)
+		}
+	}
+	page := 0
+
+	nextPage := func() {
+		if (page+1)*20 >= len(cache) {
+			fmt.Println("Already on the last page.")
+			return
+		}
+		page++
+		display(page)
+	}
+
+	prevPage := func() {
+		if page == 0 {
+			fmt.Println("Already on the first page.")
+			return
+		}
+		page--
+		display(page)
+	}
+
+	display(0)
+
+	for {
+		input, cancelled := readPrompt(false, "[%d-%d, < and > for paging, ^c to cancel]: ", page*20, min(page*20+20, len(cache)))
+		if cancelled {
+			fmt.Println("cancelled")
+			return nil
+		}
+		if input == "" {
+			if err := togglePlay(); err != nil {
+				fmt.Printf("Error: %s.\n", err)
+			}
+			continue
+		}
+
+		if input == ">" {
+			nextPage()
+			continue
+		}
+		if input == "<" {
+			prevPage()
+			continue
+		}
+
+		n, err := strconv.Atoi(input)
+		if err != nil ||
+			n < 20*page ||
+			n >= min(20*page+20, len(cache)) {
+			fmt.Printf("Please enter a value between %d and %d, use `<` and `>` for paging and press ctrl+c to cancel.\n",
+				page*20, min(page*20+20, len(cache)))
+			continue
+		}
+		return &cache[n]
+	}
 }

@@ -12,6 +12,7 @@ Libman is an interactive spotify shell.
 -	No need for premium.
 -	Simple to get started, comfortable to use.
 -	Has context aware in-application tab completions!
+-	Import and export your playlists as json.
 
 ## Authors Note
 

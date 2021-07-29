@@ -136,7 +136,7 @@ func handleImportPlaylist(arg string) error {
 	set.Find(Play).Run = func(string) error {
 		uris := make([]spotify.URI, len(p.Tracks))
 		for i, t := range p.Tracks {
-			uris[i] = t.Track.URI
+			uris[i] = t.URI
 		}
 		err := client.PlayOpt(&spotify.PlayOptions{
 			URIs: uris,
@@ -160,12 +160,12 @@ func handleImportPlaylist(arg string) error {
 		if readBool("Are you sure you want to replace all tracks in %s with those in %s?", pl.Name, p.Name) {
 			ids := make([]spotify.ID, len(p.Tracks))
 			for i, t := range p.Tracks {
-				ids[i] = t.Track.ID
+				ids[i] = t.ID
 			}
 			err := client.ReplacePlaylistTracks(pl.ID, ids...)
 			if err == nil {
 				fmt.Printf("Replaced every track in %s.\n", pl.Name)
-				pl.Tracks.Tracks = p.Tracks
+				pl.Tracks.Tracks = p.PlaylistTracks()
 			}
 			return err
 		} else {
@@ -199,14 +199,14 @@ func handleImportPlaylist(arg string) error {
 		fmt.Printf("Created new playlist %q.\n", pl.Name)
 		ids := make([]spotify.ID, len(p.Tracks))
 		for i, t := range p.Tracks {
-			ids[i] = t.Track.ID
+			ids[i] = t.ID
 		}
 		_, err = client.AddTracksToPlaylist(pl.ID, ids...)
 		if err != nil {
 			fmt.Println("Failed to add new tracks to the playlist.")
 			return err
 		}
-		pl.Tracks.Tracks = p.Tracks
+		pl.Tracks.Tracks = p.PlaylistTracks()
 		cache.insertFull(0, *pl)
 		fmt.Printf("Successfully imported all the tracks to %s.\n", pl.Name)
 		return nil

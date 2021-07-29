@@ -303,7 +303,7 @@ func handleSharePlaying(arg string) error {
 func queueTrack(t *spotify.FullTrack) error {
 	err := client.QueueSong(t.ID)
 	if err == nil {
-		fmt.Printf("Added %s by %s to the queueu.\n", t.Name, joinArtists(t.Artists))
+		fmt.Printf("Added %s by %s to the queue.\n", t.Name, joinArtists(t.Artists))
 	}
 	return err
 }

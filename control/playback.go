@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/atotto/clipboard"
 	"github.com/insomnimus/libman/handler/cmd"
@@ -273,7 +274,7 @@ func handleShow(arg string) error {
 		fmt.Println("Not playing a track.")
 	} else {
 		fmt.Printf("Currently playing %s [%s] by %s.\n", t.Name, t.Album.Name, joinArtists(t.Artists))
-		fmt.Printf("shuffle = %t\nrepeat = %s\n", shuffleState, repeatState)
+		fmt.Printf("shuffle = %t\trepeat = %s\ttotal duration = %s\n", shuffleState, repeatState, time.Duration(t.Duration)*time.Millisecond)
 	}
 	return nil
 }

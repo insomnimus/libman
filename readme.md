@@ -72,3 +72,4 @@ That's it! Just launch libman and enjoy some music.
 -	You can change the prompt! run `libman config prompt "my new prompt>"`.
 -	The config file is located at `~/.config/libman.toml` on unix, and `C:\Users\username\AppData\Roaming` on windows.
 -	Configure a history file either from the config file or with `$LIBMAN_HIST_FILE` env var for search history auto completions.
+-	Want to view every album of an artist? Simple, run: `salb *::michael jackson`.

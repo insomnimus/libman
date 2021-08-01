@@ -20,10 +20,10 @@ type Handler struct {
 
 type Set []Handler
 
-func (s *Set) Find(c uint8) *Handler {
-	for i, h := range *s {
+func (s Set) Find(c uint8) *Handler {
+	for i, h := range s {
 		if h.Cmd == c {
-			return &(*s)[i]
+			return &s[i]
 		}
 	}
 	return nil
@@ -55,10 +55,10 @@ func (s Set) ShowUsage(c uint8) {
 	}
 }
 
-func (s *Set) Match(cmd string) *Handler {
-	for i, h := range *s {
+func (s Set) Match(cmd string) *Handler {
+	for i, h := range s {
 		if h.Matches(cmd) {
-			return &(*s)[i]
+			return &s[i]
 		}
 	}
 	return nil
@@ -74,10 +74,6 @@ func (h *Handler) Matches(s string) bool {
 		}
 	}
 	return false
-}
-
-func (s *Set) Len() int {
-	return len(*s)
 }
 
 func (h *Handler) HasPrefix(s string) bool {

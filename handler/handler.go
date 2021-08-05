@@ -21,7 +21,7 @@ type Handler struct {
 type Set []Handler
 
 func (s Set) Find(c uint8) *Handler {
-	for i:= range s {
+	for i := range s {
 		if s[i].Cmd == c {
 			return &s[i]
 		}
@@ -56,7 +56,7 @@ func (s Set) ShowUsage(c uint8) {
 }
 
 func (s Set) Match(cmd string) *Handler {
-	for i:= range s {
+	for i := range s {
 		if s[i].Matches(cmd) {
 			return &s[i]
 		}

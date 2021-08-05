@@ -96,6 +96,7 @@ func (p *Playlist) editDetails() error {
 		if err != nil {
 			return err
 		}
+		p.Name = name
 		fmt.Printf("Renamed %s -> %s.\n", p.Name, name)
 	}
 

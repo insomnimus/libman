@@ -68,10 +68,6 @@ func (c *PlaylistCache) findByName(s string) *Playlist {
 	return nil
 }
 
-func (c *PlaylistCache) get(n int) *Playlist {
-	return &(cache)[n]
-}
-
 func (c *PlaylistCache) pushFollowed(p spotify.SimplePlaylist) {
 	pl := Playlist{
 		FullPlaylist: spotify.FullPlaylist{SimplePlaylist: p},

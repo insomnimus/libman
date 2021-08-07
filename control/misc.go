@@ -20,6 +20,7 @@ func handleHelp(arg string) error {
 		for _, h := range handlers {
 			fmt.Println(h.String())
 		}
+		fmt.Println("\nYou can also paste a spotify link to play from.")
 	} else {
 		h := handlers.Match(arg)
 		if h == nil {

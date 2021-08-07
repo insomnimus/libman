@@ -60,7 +60,7 @@ func Start(
 ) {
 	rl = liner.NewLiner()
 	rl.SetCtrlCAborts(true)
-	// defer rl.Close() // can never be executed
+
 	client = c
 	user = u
 	if p != "" {
@@ -115,10 +115,14 @@ func Start(
 			cmd, arg := splitCmd(input)
 			h := handlers.Match(cmd)
 			if h == nil {
-				fmt.Printf("%s is not a known command or alias.\nRun `help` for a list of available commands.\n", cmd)
-				continue
+				if !strings.HasPrefix(input, "https://open.spotify.com/") {
+					fmt.Printf("%s is not a known command or alias.\nRun `help` for a list of available commands.\n", cmd)
+					continue
+				}
+				err = handleLink(input)
+			} else {
+				err = h.Run(arg)
 			}
-			err = h.Run(arg)
 		}
 		if err != nil {
 			fmt.Printf("error: %s\n", err)

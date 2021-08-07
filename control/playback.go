@@ -293,6 +293,7 @@ func handleSharePlaying(arg string) error {
 		fmt.Println("Not playing a track.")
 		return nil
 	}
+
 	err = clipboard.WriteAll(t.ExternalURLs["spotify"])
 	if err != nil {
 		return err

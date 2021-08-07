@@ -31,14 +31,18 @@ func (s Set) Find(c uint8) *Handler {
 
 func (h Handler) String() string {
 	if len(h.Aliases) == 0 {
-		return fmt.Sprintf("#%s\n  %s", h.Name, h.About)
+		return fmt.Sprintf("#%s: %s", h.Name, h.About)
 	}
-	return fmt.Sprintf("#%s [aliases: %s]\n  %s", h.Name, strings.Join(h.Aliases, ", "), h.About)
+	return fmt.Sprintf("#%s [aliases: %s]:  %s", h.Name, strings.Join(h.Aliases, ", "), h.About)
 }
 
 func (h Handler) GoString() string {
+	help := h.About
+	if h.Help != "" {
+		help = h.Help
+	}
 	if len(h.Aliases) == 0 {
-		return fmt.Sprintf("#%s\nusage:\n  %s\n  %s", h.Name, h.Usage, h.Help)
+		return fmt.Sprintf("#%s\nusage:\n  %s\n  %s", h.Name, h.Usage, help)
 	}
 
 	return fmt.Sprintf(`#%s
@@ -46,7 +50,7 @@ aliases:
   %s
 usage:
   %s
-  %s`, h.Name, strings.Join(h.Aliases, ", "), h.Usage, h.Help)
+  %s`, h.Name, strings.Join(h.Aliases, ", "), h.Usage, help)
 }
 
 func (s Set) ShowUsage(c uint8) {

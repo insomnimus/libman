@@ -105,7 +105,7 @@ func (p *PlaylistBuf) prevPage() {
 
 func (p *PlaylistBuf) nextPage() {
 	p.updateIndices()
-	if p.upTo+PlaylistPageSize > len(p.pl.Tracks.Tracks) {
+	if p.startFrom+PlaylistPageSize > len(p.pl.Tracks.Tracks) {
 		fmt.Println("Already on the last page.")
 		return
 	}

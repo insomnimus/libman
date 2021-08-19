@@ -2,6 +2,7 @@ package control
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -47,14 +48,6 @@ func (p *Playlist) editTracks() error {
 		*p = Playlist{*pl, true, false}
 	}
 	return nil
-}
-
-func (p *PlaylistBuf) remove(n int) {
-	t := p.pl.Tracks.Tracks[n]
-	p.pl.Tracks.Tracks = append(p.pl.Tracks.Tracks[:n], p.pl.Tracks.Tracks[n+1:]...)
-	p.removes = append(p.removes, t)
-	fmt.Printf("Queued %s for removal.\n", t.Track.Name)
-	p.updateIndices()
 }
 
 func (p *PlaylistBuf) add(track spotify.FullTrack) {
@@ -248,8 +241,8 @@ func (p *PlaylistBuf) defaultHandlers() handler.Set {
 			plcmd.Remove,
 			"remove",
 			"Remove a track from the playlist.",
-			"remove <N>",
-			"Queue a track for removal.",
+			"remove <N...>",
+			"Queue 1 or more tracks for removal.",
 			[]string{"rm", "del"},
 			p.handleRemove,
 		),
@@ -387,17 +380,29 @@ func (p *PlaylistBuf) discardChanges() {
 }
 
 func (p *PlaylistBuf) handleRemove(arg string) {
-	n, err := strconv.Atoi(arg)
-	if err != nil {
+	if arg == "" {
 		p.handlers.ShowUsage(plcmd.Remove)
 		return
 	}
-	if n < p.startFrom || n >= p.upTo {
-		fmt.Printf("Please enter a value between %d and %d.\n", p.startFrom, p.upTo)
-		return
+
+	split := strings.Fields(arg)
+	nums := make([]int, 0, len(split))
+	for _, s := range split {
+		n, err := strconv.Atoi(s)
+		if err != nil {
+			fmt.Printf("'%s' is not a valid number.\n", s)
+			continue
+		}
+		if n < p.startFrom || n >= p.upTo {
+			fmt.Printf("Please enter a value between %d and %d.\n", p.startFrom, p.upTo)
+			continue
+		}
+		nums = append(nums, n)
 	}
 
-	p.remove(n)
+	if len(nums) > 0 {
+		p.remove(nums...)
+	}
 }
 
 func (p *PlaylistBuf) updateIndices() {
@@ -519,4 +524,24 @@ func (p *PlaylistBuf) handleHelp(arg string) {
 
 func (p *PlaylistBuf) hasChanges() bool {
 	return len(p.adds) != 0 || len(p.removes) != 0
+}
+
+func (p *PlaylistBuf) remove(indices ...int) {
+	sort.Ints(indices)
+	remaining := make([]spotify.PlaylistTrack, 0, len(p.pl.Tracks.Tracks)-len(indices))
+	fmt.Println("Queued for removal:")
+	for i, t := range p.pl.Tracks.Tracks {
+		if len(indices) == 0 {
+			break
+		}
+		if i == indices[0] {
+			indices = indices[1:]
+			p.removes = append(p.removes, t)
+			fmt.Printf("-  %s by %s\n", t.Track.Name, joinArtists(t.Track.Artists))
+		} else {
+			remaining = append(remaining, t)
+		}
+	}
+
+	p.pl.Tracks.Tracks = remaining
 }

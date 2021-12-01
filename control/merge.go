@@ -68,11 +68,16 @@ LOOP:
 			fmt.Println("You don't have a playlist by that name.")
 			continue
 		}
+
 		for _, added := range pls {
 			if added.ID == pl.ID {
 				fmt.Printf("You already added %s.", pl.Name)
 				continue LOOP
 			}
+		}
+		if err := pl.makeFull(); err != nil {
+			fmt.Println(err)
+			return nil
 		}
 		pls = append(pls, pl)
 		fmt.Printf("Added %s.\n", pl.Name)
@@ -107,7 +112,7 @@ func handleMerge(args string) error {
 		return err
 	}
 
-	for i := 0; i/100 < len(ids); i += 100 {
+	for i := 0; i < len(ids); i += 100 {
 		upto := i + 100
 		if upto > len(ids) {
 			upto = len(ids)

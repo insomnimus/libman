@@ -36,6 +36,15 @@ func DefaultHandlers() handler.Set {
 			handleEditPlaylistDetails,
 		),
 		hand(
+			cmd.MergePlaylist,
+			"merge-playlist",
+			"Merge several playlists into one.",
+			"merge-playlist [playlist]",
+			"Merge several playlists into one, de-duplicating the tracks.",
+			[]string{"merge"},
+			handleMerge,
+		),
+		hand(
 			cmd.LikePlaying,
 			"like-playing",
 			"Save the currently playing track to your 'my music' folder.",
@@ -374,6 +383,7 @@ func _applySuggestPlaylist(set handler.Set) {
 	set.Find(cmd.EditPlaylistDetails).Complete = suggestPlaylist
 	// set.Find(cmd.PlayUserPlaylist).Complete = suggestPlaylist
 	set.Find(cmd.SavePlaying).Complete = suggestPlaylist
+	set.Find(cmd.MergePlaylist).Complete = suggestPlaylist
 	set.Find(cmd.RemovePlaying).Complete = suggestPlaylist
 	set.Find(cmd.EditPlaylist).Complete = suggestPlaylist
 	set.Find(cmd.DeletePlaylist).Complete = suggestPlaylist

@@ -41,4 +41,5 @@ const (
 	Recommend
 	ImportPlaylist
 	ExportPlaylist
+	MergePlaylist
 )

@@ -85,3 +85,11 @@ func (c *PlaylistCache) ownedNames() []string {
 	}
 	return names
 }
+
+func (c *PlaylistCache) names() []string {
+	names := make([]string, 0, len(*c))
+	for _, p := range *c {
+		names = append(names, p.Name)
+	}
+	return names
+}

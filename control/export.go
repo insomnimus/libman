@@ -228,6 +228,9 @@ func handleImportPlaylist(arg string) error {
 			fmt.Printf("%s is not a known command or alias.\nRun `help` for a list of available commands.\n", command)
 			continue
 		}
+		if h.Cmd == Help {
+			continue
+		}
 		return h.Run(arg)
 	}
 }

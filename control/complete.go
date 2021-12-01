@@ -156,3 +156,18 @@ func suggestPath(buf string) []string {
 	}
 	return items
 }
+
+func newCompleter(vals ...string) func(string) []string {
+	return func(buf string) []string {
+		conds := make([]string, 0, len(vals))
+		for _, s := range vals {
+			if hasPrefixFold(s, buf) {
+				conds = append(conds, s)
+			}
+		}
+		if len(conds) == 0 {
+			return nil
+		}
+		return conds
+	}
+}

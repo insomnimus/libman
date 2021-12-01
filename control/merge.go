@@ -106,7 +106,8 @@ func handleMerge(args string) error {
 	if err != nil {
 		return err
 	}
-	for i := 0; i < len(ids); i += 100 {
+
+	for i := 0; i/100 < len(ids); i += 100 {
 		upto := i + 100
 		if upto > len(ids) {
 			upto = len(ids)
@@ -117,6 +118,7 @@ func handleMerge(args string) error {
 			return err
 		}
 	}
+
 	pl.Tracks.Tracks = tracks
 	cache.insertFull(0, *pl)
 	fmt.Printf("Success. %s is ready.\n", name)

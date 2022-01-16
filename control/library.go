@@ -89,12 +89,24 @@ func handleEditPlaylist(arg string) error {
 func updateCache() error {
 	if cache == nil {
 		// page, err := client.CurrentUsersPlaylists()
-		page, err := client.GetPlaylistsForUser(user.ID)
-		if err != nil {
-			return err
+
+		cache = make(PlaylistCache, 0)
+		var pls []spotify.SimplePlaylist
+
+		for {
+			limit := 50
+			page, err := client.GetPlaylistsForUserOpt(user.ID, &spotify.Options{
+				Limit: &limit,
+			})
+			if err != nil {
+				return err
+			}
+			pls = append(pls, page.Playlists...)
+			if len(page.Playlists) < limit {
+				break
+			}
 		}
-		cache = make(PlaylistCache, 0, len(page.Playlists))
-		for _, p := range page.Playlists {
+		for _, p := range pls {
 			if p.Owner.ID != string(user.ID) {
 				cache.pushFollowed(p)
 			} else {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/insomnimus/libman/config"
@@ -20,7 +21,7 @@ type Creds struct {
 	Token  *oauth2.Token
 }
 
-func authorize(auth *spotify.Authenticator) (*Creds, error) {
+func authorize(addr string, auth *spotify.Authenticator) (*Creds, error) {
 	ch := make(chan *spotify.Client)
 	completeAuth := func(w http.ResponseWriter, r *http.Request) {
 		tok, err := auth.Token(state, r)
@@ -37,11 +38,9 @@ func authorize(auth *spotify.Authenticator) (*Creds, error) {
 		fmt.Fprintf(w, "Login Completed!")
 		ch <- &client
 	}
+
 	http.HandleFunc("/callback", completeAuth)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// log.Println("Got request for:", r.URL.String())
-	})
-	go http.ListenAndServe(":8080", nil)
+	go http.ListenAndServe(addr, nil)
 
 	url := auth.AuthURL(state)
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
@@ -105,8 +104,13 @@ func Login(c *config.Config) (*Creds, error) {
 		}
 	}
 
+	u, err := url.Parse(c.RedirectURI)
+	if err != nil {
+		return nil, err
+	}
+
 	// no cache file, prompt for access grant
-	return authorize(&auth)
+	return authorize(u.Host, &auth)
 }
 
 func login(auth *spotify.Authenticator, token *oauth2.Token) (*Creds, error) {
